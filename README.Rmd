@@ -5,12 +5,12 @@ date: "2023-08-08"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = F, echo = T, message = F)
 ```
 
 ## Fair Housing Map
 
-CTCAC/HCD Opportunity and Neighborhood Change Map.
+In process documentation for CTCAC/HCD Opportunity and Neighborhood Change Map package, temporarily called the "Fair Housing Map" until further directed by CTCAC and HCD.
 
 ### Package Manual
 
@@ -27,8 +27,7 @@ CTCAC/HCD Opportunity and Neighborhood Change Map.
 4.  Load package and install dependencies:
 
 ```{r}
-install.packages('devtools')
-devtools::install_dev_deps(upgrade = 'always')
+devtools::install_dev_deps()
 ```
 
 ```{r}
@@ -41,15 +40,7 @@ devtools::load_all()
 
 2.  Install the key in the tidycensus package. See `?tidycensus::census_api_key()` for details
 
-3.  Build directory paths not included in repository:
-
-```{r}
-lapply(2024, function(x){
-  dir.create(paste0('data/intermediate/', x), recursive=T)
-  dir.create(paste0('output/', x), recursive=T)
-  dir.create('output/alternative_scenarios')
-})
-```
+3.  Build directory paths not included in repository: 'data/intermediate/2024/' and 'output/2024/'
 
 ### Directory Structure
 
@@ -63,15 +54,15 @@ lapply(2024, function(x){
 
 -   *README* - project root documentation
 
--   *.gitignore* - instructions for git to ignore files.
+-   *.gitignore* - instructions for git to ignore files
 
--   *R* - R package functions, executes all code that goes into published tables and maps.
+-   *R* - R package functions, executes all code that goes into published tables and maps
 
--   *map* - contains the webmaps for each year since 2019. Produced in javascript after 2019.
+-   *map* - javascript webmaps
 
 -   *tests* - testthat tests to ensure package is working as expected
 
 ### TODO
 
--   The legacy packages maptools, rgdal, and rgeos, underpinning the sp package, which was just loaded, will retire in October 2023. Replace functions that depend on sp with sf package equivalents
--   Develop testthat test suite
+-   Develop testthat test suite.
+-   The legacy packages maptools, rgdal, and rgeos, underpinning the sp package, which is a dependency, will retire in October 2023. Replace functions that depend on sp with sf package equivalents.
