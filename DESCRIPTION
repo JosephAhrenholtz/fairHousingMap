@@ -1,11 +1,22 @@
 Package: fairHousingMap
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Create CTCAC/HCD Fair Housing Map
 Version: 0.1.0
 Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Code that produces the CTCAC/HCD Fair Housing Map
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    sf,
+    sp,
+    testthat,
+    tidycensus,
+    tidyverse
+Suggests:
+  tigris,
+  mapview,
+  testthat (>= 3.0.0),
+RoxygenNote: 7.2.3
+Config/testthat/edition: 3
