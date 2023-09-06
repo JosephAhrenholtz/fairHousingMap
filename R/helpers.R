@@ -28,20 +28,22 @@ current_year = 2024
 
 #' @rdname helper_functions
 read_zip <- function(name, year, type = 'csv', ...) {
-  # syear <- year %% 100
+
   # import all filenames
   filepaths(year = year)
   # get the path and year for the specified 'name'
-  #path <- name
   data_year <- name[1]
   file_name <- name[2]
-  # Execute
 
+
+  # Execute
   if(type %in% c('excel', 'xls','xlsx')){
-    # Excel can't be read from zipped file, so I unzip and then delete the file instead.
+
+
+    # Excel can't be read from zipped file, so unzip and then delete the file.
     #extract file path, and rewrite the path back to the temp folder it will be extracted into.
     tempFolder = tempdir()
-    output <- paste0(tempFolder, "/",file_name)
+    output <- paste0(tempFolder, "\\", file_name)
     unzip(paste0('data-raw/',data_year,'.zip'), file_name,
           exdir = tempFolder)
     #read the excel file
@@ -55,7 +57,6 @@ read_zip <- function(name, year, type = 'csv', ...) {
 
     if(type == 'csv') df <- readr::read_csv(connection, ...)
     else if(type == 'tsv') df <- readr::read_tsv(connection,  ...)
-    # reading and math switched to caret delimited in 2023
     else if(type == 'delim') df <- readr::read_delim(connection, delim = '^',  ...)
     else if(type %in% c('table', 'txt')) df <- readr::read_table(connection, ...)
     else stop('Error: Invalid "type" selected.')
