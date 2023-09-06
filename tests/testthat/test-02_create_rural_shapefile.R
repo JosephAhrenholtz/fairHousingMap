@@ -15,6 +15,8 @@
 
 
 testthat::test_that('interiors of USDA ineligible areas are spatially distinct from interiors of rural shapefile',{
+  setwd(here::here())
+  filepaths()
 
   shape_USDA_excluded <- sf::st_read(USDA_excluded, quiet = TRUE)
   shape_USDA_excluded <- subset(shape_USDA_excluded, STATENAME == 'California')

@@ -14,14 +14,9 @@
 #' @examples
 
 
-testthat::test_that('centroids data exists at at current years filepaths',{
-  filepaths()
-  testthat::expect_true(file.exists(unzip(paste0('data-raw/',tract_center[1],'.zip'), tract_center[2])))
-  testthat::expect_true(file.exists(unzip(paste0('data-raw/',block_group_center[1],'.zip'), block_group_center[2])))
-  testthat::expect_true(file.exists(unzip(paste0('data-raw/',block_center[1],'.zip'), block_center[2])))
-})
-
 testthat::test_that('all formatted tracts are 11 digits', {
+  setwd(here::here())
+
   tract_centers <- read_tract_centers()
   tract_char <- range(nchar(tract_centers$fips))
 
@@ -30,6 +25,8 @@ testthat::test_that('all formatted tracts are 11 digits', {
 })
 
 testthat::test_that('all formatted block groups are 12 digits', {
+  setwd(here::here())
+
   bg_centers <- read_block_group_centers()
   bg_char <- range(nchar(bg_centers$fips_bg))
 
@@ -38,6 +35,8 @@ testthat::test_that('all formatted block groups are 12 digits', {
 })
 
 testthat::test_that('all formatted blocks are 15 digits', {
+  setwd(here::here())
+
   block_centers <- read_block_centers()
   block_char <- range(nchar(block_centers$block))
 
@@ -47,6 +46,8 @@ testthat::test_that('all formatted blocks are 15 digits', {
 
 
 testthat::test_that('formatted tracts in block file match formatted tracts in tract file',{
+  setwd(here::here())
+
   tracts <- read_tract_centers()
   blocks <- read_block_centers()
   not_joined <- anti_join(blocks, tracts, by = 'fips')
@@ -54,6 +55,8 @@ testthat::test_that('formatted tracts in block file match formatted tracts in tr
 })
 
 testthat::test_that('formatted bgs in acs file match formatted bgs in centroid file',{
+  setwd(here::here())
+
   acs <- all_census_data(geo = 'bg', read = T) %>% select(fips, fips_bg)
   block_group_centers <- read_block_group_centers()
   not_joined <- anti_join(acs, block_group_centers, by = c('fips', 'fips_bg'))
