@@ -1,4 +1,5 @@
-#' Imports education data and saves the relevant variables to the intermediate directory
+#' Imports education data and writes the relevant variables to the intermediate directory
+#'
 #'
 #' @details Reading data is weighted by total enrollment of schools that
 #'   return 4th-grade test scores. FRPM data is limited to and weighted
@@ -7,11 +8,11 @@
 #'
 #'
 #' @param year designates the appropriate filepaths
-#' @param write will write a new file to the intermediate directory
-#' @param read rill read an existing file from the intermediate directory
+#' @param write write the intermediate file
+#' @param read read an existing intermediate file
 #'
 #' @return a data frame
-#' @export
+#'
 #'
 #' @examples
 #' graduation_rates() # reads an existing intermediate file at the default year
@@ -25,9 +26,7 @@
 #' @source FRPM: http://www.cde.ca.gov/ds/sd/sd/filessp.asp
 #' @source Cohort Grad data: https://www.cde.ca.gov/ds/ad/filesacgr.asp
 #'
-#'
-#' @inheritParams final_TCAC
-#'
+#' @export
 read_educ_pov <- function(year = current_year) {
   filepaths(year = year)
 
@@ -82,22 +81,6 @@ read_educ_pov <- function(year = current_year) {
 
 
 
-#' Imports graduation data and saves the relevant variables
-#'
-#' Graudation rates are calculated as the enrollment-weighted average
-#'   of the three schools closest to the tract centroid.
-#'
-#'
-#' @details 2019 version allocates schools to school districts, but 2020 code
-#'   simply reads in lat/lon data, as it they are distributed by allocating
-#'   the three closest schools to the block group, as with primary schoool
-#'   data.
-#'
-#' @note In 2020+, DASS schools are omitted. Charter schools are included.
-#'
-#' @source https://www.cde.ca.gov/ds/sd/sd/filescohort.asp
-#'
-#' @export
 graduation_rates <- function(year = current_year, write = FALSE,
   read = !write){
   if(read == T){
@@ -125,7 +108,7 @@ graduation_rates <- function(year = current_year, write = FALSE,
     grad_rate <- dplyr::inner_join(xwalk_nces, graduation, by = c('CDSCode' = 'CDS'))
 
     #select only active districts
-    grad_rate <- subset(grad_rate, ReportingCategory = 'TA', StatusType == 'Active')# (SOC == '65' | SOC == '66' | SOC == '67' | SOC == '68' | SOC == '69'),
+    grad_rate <- subset(grad_rate, ReportingCategory = 'TA', StatusType == 'Active')
 
     grad_rate <- dplyr::transmute(grad_rate, CDSCode, grad_rate = grad_rate/100,
       county_name = County, hs_drop_rate = hs_drop_rate/100,

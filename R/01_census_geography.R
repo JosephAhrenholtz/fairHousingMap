@@ -1,22 +1,26 @@
 #' Reads pop-weighted centroids of Census tracts, block groups, and blocks
 #'
-#' @param as_shape returns shapefile
-#' @param year designates the appropriate filepaths
 #'
+#' @param as_shape returns shapefile
+#' @param year designates the map year's filepaths
 #' @return a data frame
-#' @export
+#'
 #'
 #' @examples
-#' read_tract_centers(as_shape = T) # returns tract centers as shapefile based on the default year
+#' read_tract_centers(as_shape = T) # returns tract centroids as shapefile based on the default year
+#'
 #'
 #' @import dplyr
 #' @importFrom sp coordinates proj4string
 #' @importFrom sf st_as_sf
 #' @importFrom magrittr %>%
 #'
+#'
 #' @source tract/bg centroids: https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.html
 #' @source block centroids: https://mcdc.missouri.edu/applications/geocorr2022.html
+#'
 
+#' @export
 read_tract_centers <- function(as_shape = FALSE,
                                year = current_year){
   filepaths(year = year)
@@ -31,7 +35,7 @@ read_tract_centers <- function(as_shape = FALSE,
   tract_centers
 }
 
-
+#' @export
 read_block_group_centers <- function(as_shape = FALSE,
                                year = current_year){
   filepaths(year = year)
@@ -48,7 +52,8 @@ read_block_group_centers <- function(as_shape = FALSE,
   block_group_centers
 }
 
-read_block_centers <- function(other_states = FALSE, as_shape = FALSE,
+#' @export
+read_block_centers <- function(as_shape = FALSE,
                                year = current_year, geo = 'tract'){
   filepaths(year = year)
   bc_cols <- c("county", "tract", "block", "us", "cntyname", "pop20", "lat", "lon", "afact" )

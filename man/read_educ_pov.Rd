@@ -2,7 +2,7 @@
 % Please edit documentation in R/05_education_data.R
 \name{read_educ_pov}
 \alias{read_educ_pov}
-\title{Imports education data and saves the relevant variables to the intermediate directory}
+\title{Imports education data and writes the relevant variables to the intermediate directory}
 \source{
 School data: https://www.cde.ca.gov/ds/si/ds/pubschls.asp
 
@@ -18,15 +18,15 @@ read_educ_pov(year = current_year)
 \arguments{
 \item{year}{designates the appropriate filepaths}
 
-\item{write}{will write a new file to the intermediate directory}
+\item{write}{write the intermediate file}
 
-\item{read}{rill read an existing file from the intermediate directory}
+\item{read}{read an existing intermediate file}
 }
 \value{
 a data frame
 }
 \description{
-Imports education data and saves the relevant variables to the intermediate directory
+Imports education data and writes the relevant variables to the intermediate directory
 }
 \details{
 Reading data is weighted by total enrollment of schools that

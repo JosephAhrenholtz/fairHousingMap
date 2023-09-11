@@ -2,7 +2,7 @@
 % Please edit documentation in R/06_education_distance.R
 \name{school_distances}
 \alias{school_distances}
-\title{Imports education data and saves the relevant variables}
+\title{Creates tract/block group education scores}
 \usage{
 school_distances(
   year = current_year,
@@ -16,26 +16,23 @@ school_distances(
 
 \item{geo}{tract or bg}
 
-\item{write}{will write a new file to the intermediate directory}
+\item{write}{write the intermediate file}
 
-\item{read}{rill read an existing file from the intermediate directory}
+\item{read}{read an existing intermediate file}
 }
 \value{
 a data frame
 }
 \description{
-Imports education data and saves the relevant variables
+Creates tract/block group education scores
 }
 \details{
-Finds school distance to tract or block group centroids (within-county), and averages
-  the reading and math scores, frpm, and graduation rates of three nearest
-  schools. 4th grade and FRPM are weighted by the enrollment of schools that
+Finds school distance to tract or block group centroids, and averages
+  the reading and math scores, frpm, and graduation rates of the three nearest
+  schools.  4th grade and FRPM are weighted by the enrollment of schools that
   serve 4th-graders, and graduation rates are weighted by cohort size.
 }
 \examples{
-school_distances(year = 2024, geo = 'tract', write = TRUE, read = FALSE) # writes a new intermediate file to the intermediate directory
+school_distances(year = 2024, geo = 'tract', write = TRUE, read = FALSE) # writes a new file to the intermediate directory
 
-}
-\seealso{
-education_data.R for data imported into the distance calculation
 }

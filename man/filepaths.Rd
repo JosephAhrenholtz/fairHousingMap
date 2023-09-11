@@ -3,15 +3,19 @@
 \name{filepaths}
 \alias{filepaths}
 \title{Shortcuts to zipped files in the data-raw directory. See `?read_zip`}
-\source{
-\itemize{
-  \item USDA_excluded: http://www.sc.egov.usda.gov/data/data_files.html, SFH/MFH Ineligibility
-  \item school data: see education_enviroscreen.R
-}
-}
 \usage{
 filepaths(year = current_year)
 }
+\arguments{
+\item{year}{designates the map year's filepaths}
+}
+\value{
+filepaths to raw data are loaded into environment
+}
 \description{
 Shortcuts to zipped files in the data-raw directory. See `?read_zip`
+}
+\examples{
+filepaths(year = 2024)
+
 }

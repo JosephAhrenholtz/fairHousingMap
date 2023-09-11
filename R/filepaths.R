@@ -1,27 +1,30 @@
 #' Shortcuts to zipped files in the data-raw directory. See `?read_zip`
 #'
-#' @source
-#' \itemize{
-#'   \item USDA_excluded: http://www.sc.egov.usda.gov/data/data_files.html, SFH/MFH Ineligibility
-#'   \item school data: see education_enviroscreen.R
-#' }
-
-
+#'
+#' @param year designates the map year's filepaths
+#'
+#'
+#' @return filepaths to raw data are loaded into environment
+#'
+#'
+#' @examples
+#' filepaths(year = 2024)
+#'
+#' @export
 filepaths <- function(year = current_year) {
-  # syear= year %% 100
+
 
 if(year >= 2024){
 
-
-  # Census centroids and area
+  # Census
+  assign("census_variables", c(2020, 'census20_variables.csv'), parent.frame())
   assign("tract_center_USA", c(2020,"CenPop2020_Mean_TR.txt"), parent.frame())
   assign("tract_center", c(2020, "CenPop2020_Mean_TR06.txt"), parent.frame())
   assign("block_group_center", c(2020, "CenPop2020_Mean_BG06.txt"), parent.frame())
   assign("block_group_center_USA", c(2020, "CenPop2020_Mean_BG.txt"), parent.frame())
-  assign("bg_area", c(2020, "block_group_area_2020.csv"), parent.frame())
-  assign("tract_area", c(2020, "tract_area_2020.csv"), parent.frame())
+  assign("bg_area", c(2020, "bg_area2020.txt"), parent.frame())
+  assign("tract_area", c(2020, "tract_area2020.txt"), parent.frame())
   assign("block_center", c(2020, "block_centroids2020_CA.txt"), parent.frame())
-  assign("block_center_AZNVOR", c(2020, "block_centroids2020_AZ_NV_OR.csv"), parent.frame())
 
   # Economic
   assign("acs_variables", c(2021, 'acs21_variables.csv'), parent.frame())
@@ -37,8 +40,7 @@ if(year >= 2024){
   # region
   assign("USDA_excluded", c('data-raw/shapefiles/2021/SFH_MFH_Ineligible_20211117/SFH_MFH_Ineligible.shp'), parent.frame())
   assign("county_region_xwalk", c(2019, "county-region_xwalk.csv"), parent.frame())
-  # assign("county_MPO_xwalk", c(2019, "county-MPO_xwalk.csv"), parent.frame())
-  # assign("county_cog_xwalk", c(2019, "county-cog-xwalk.csv"), parent.frame())
+
 }
 }
 

@@ -2,20 +2,29 @@
 % Please edit documentation in R/02_create_rural_shapefile.R
 \name{shape_rural}
 \alias{shape_rural}
-\title{Imports USDA shapefile for areas ineligible for rural designation}
+\title{Create rural designation shapefile}
 \source{
 USDA areas ineligible for rural development housing programs: https://www.sc.egov.usda.gov/data/data_files.html
 
-Changes in 2019 detailed
-  \href{https://www.rd.usda.gov/files/CA-SFH-NoticeRuralAreaReview-Final-4.16.18.pdf}{here}.
+Changes in 2019 detailed: https://www.rd.usda.gov/files/CA-SFH-NoticeRuralAreaReview-Final-4.16.18.pdf
 }
 \usage{
 shape_rural(year = current_year, write = FALSE)
 }
 \arguments{
-\item{read}{Reads from file, rather than computing. Saves time in evaluation for other functions.}
+\item{year}{designates the map year's filepaths}
+
+\item{write}{whether to write the intermediate shapefile}
+}
+\value{
+a shapefile
 }
 \description{
-Reads USDA urban areas, then shrinks to only California data and subtracts them from the
-  complete California shapefile to get a rural areas shapefile.
+Imports USDA shapefile for areas ineligible for rural designation, then shrinks to only California data and subtracts them from the
+complete California shapefile to get a rural areas shapefile.
+}
+\examples{
+shape_rural(write = T) # computes and writes the rural shapefile to the intermediate directory
+
+
 }

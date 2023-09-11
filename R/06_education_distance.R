@@ -1,28 +1,24 @@
-#' Imports education data and saves the relevant variables
+#' Creates tract/block group education scores
 #'
-#' @details Finds school distance to tract or block group centroids (within-county), and averages
-#'   the reading and math scores, frpm, and graduation rates of three nearest
-#'   schools. 4th grade and FRPM are weighted by the enrollment of schools that
+#' @details Finds school distance to tract or block group centroids, and averages
+#'   the reading and math scores, frpm, and graduation rates of the three nearest
+#'   schools.  4th grade and FRPM are weighted by the enrollment of schools that
 #'   serve 4th-graders, and graduation rates are weighted by cohort size.
 #'
 #' @param year designates the appropriate filepaths
 #' @param geo tract or bg
-#' @param write will write a new file to the intermediate directory
-#' @param read rill read an existing file from the intermediate directory
+#' @param write write the intermediate file
+#' @param read read an existing intermediate file
 #'
 #' @return a data frame
-#' @export
 #'
 #' @examples
-#' school_distances(year = 2024, geo = 'tract', write = TRUE, read = FALSE) # writes a new intermediate file to the intermediate directory
+#' school_distances(year = 2024, geo = 'tract', write = TRUE, read = FALSE) # writes a new file to the intermediate directory
 #'
 #' @import dplyr
 #' @importFrom geosphere distGeo
 #'
-#' @seealso education_data.R for data imported into the distance calculation
-#'
-#'
-
+#' @export
 school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
   read = !write){
   filename = paste0("data/intermediate/", year,'/education_indicators_', geo, '.csv.gz')
@@ -59,7 +55,7 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
 
   for(i in 1:nrow(centroids)){
     row <- centroids[i,]
-    #limiting scope to schools within a ~30 mile radius for speed of processing.
+    #limiting scope to schools within a ~30 mile radius for speed of processing
     near_elem <- dplyr::filter(test_scores, dplyr::between(lon, row$lon -0.5, row$lon+0.5) &
         dplyr::between(lat, row$lat -0.5, row$lat+0.5))
     near_frpm <- dplyr::filter(frpm, dplyr::between(lon, row$lon -0.5, row$lon+0.5) &

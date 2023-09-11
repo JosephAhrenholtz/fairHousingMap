@@ -14,7 +14,7 @@ read_tract_centers(as_shape = FALSE, year = current_year)
 \arguments{
 \item{as_shape}{returns shapefile}
 
-\item{year}{designates the appropriate filepaths}
+\item{year}{designates the map year's filepaths}
 }
 \value{
 a data frame
@@ -23,6 +23,7 @@ a data frame
 Reads pop-weighted centroids of Census tracts, block groups, and blocks
 }
 \examples{
-read_tract_centers(as_shape = T) # returns tract centers as shapefile based on the default year
+read_tract_centers(as_shape = T) # returns tract centroids as shapefile based on the default year
+
 
 }

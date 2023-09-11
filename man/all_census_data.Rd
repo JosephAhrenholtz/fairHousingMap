@@ -2,8 +2,9 @@
 % Please edit documentation in R/04_census_data.R
 \name{all_census_data}
 \alias{all_census_data}
+\alias{read_census_data}
 \alias{read_acs_data}
-\title{Loads all ACS data into a single data frame.}
+\title{Loads all ACS and decennial Census data into a single data frame.}
 \source{
 Census API
 
@@ -17,33 +18,39 @@ all_census_data(
   read = !write
 )
 
+read_census_data(year = current_year, geo = "tract")
+
 read_acs_data(year = current_year, geo = "tract")
 }
 \arguments{
-\item{year}{specify map year}
+\item{year}{designates the map year's filepaths}
 
 \item{geo}{tract or block group}
 
-\item{write}{logical}
+\item{write}{write the intermediate file}
 
-\item{read}{logical}
+\item{read}{read an existing intermediate file}
 }
 \value{
 a data frame
 }
 \description{
-Loads all ACS data into a single data frame.
+Downloads all relevant decennial and ACS data from Census API using tidycensus, then derives percentages and
+calculates margins of error for derived variables.
 }
 \details{
 To use the Census APIs, sign up for an API key. Add Census API key to .Renviron profile and call it CENSUS_KEY. censusapi will use it by
   default. Within R, run: \cr
-
   Add key to .Renviron \cr
   `Sys.setenv(CENSUS_KEY= 'YOURKEYHERE')`\cr
   Reload .Renviron \cr
   `readRenviron("~/.Renviron")` \cr
   Check to see that the expected key is output in your R console \cr
   `Sys.getenv("CENSUS_KEY")` \cr
-
   `tidycensus::census_api_key('YOURKEYHERE', overwrite = TRUE, install = TRUE)` \cr
+}
+\examples{
+all_census_data(read = F) # downloads decennial and acs data for the current map year at the tract level
+
+
 }
