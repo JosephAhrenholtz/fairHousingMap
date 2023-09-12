@@ -1,0 +1,144 @@
+--------------------------------------------------------------------------------
+Codebook for NHGIS data file 'nhgis0003_ds152_2000_blck_grp_090'
+--------------------------------------------------------------------------------
+ 
+Contents
+    - Data Summary
+    - Data Dictionary
+    - Citation and Use
+ 
+Additional documentation on NHGIS data sources is available at: 
+    https://www.nhgis.org/documentation/tabular-data 
+ 
+--------------------------------------------------------------------------------
+Data Summary
+--------------------------------------------------------------------------------
+ 
+Year:             2000
+Geographic level: Block Group [2000 & 2010 partition] (by State--County--County Subdivision--Place/Remainder--Census Tract--Urban/Rural)
+Extent:           California
+Dataset:          2000 Census: SF 3b - Sample-Based Data [Block Groups]
+   NHGIS code:    2000_SF3b
+   NHGIS ID:      ds152
+ 
+Tables:
+ 
+1. Specified Renter-Occupied Housing Units with Cash Rent by Gross Rent
+   Universe:    Specified Renter-Occupied Housing Units with Cash Rent
+   Source code: NH062A
+   NHGIS code:  G8B
+ 
+--------------------------------------------------------------------------------
+Data Dictionary
+--------------------------------------------------------------------------------
+ 
+Context Fields 
+    GISJOIN:     GIS Join Match Code
+    YEAR:        Data File Year
+    STUSAB:      File Identification
+    REGION:      Region
+    DIVISION:    Division
+    STATE:       State Name
+    STATEA:      State Code
+    COUNTY:      County Name
+    COUNTYA:     County Code
+    CTY_SUB:     County Subdivision Name
+    CTY_SUBA:    County Subdivision Code
+    COUSUBCC:    FIPS County Subdivion Class Code
+    PLACE:       Place Name
+    PLACEA:      Place Code
+    PLACECC:     FIPS Place Class Code
+    PLACEDC:     Place Description Code
+    TRACTA:      Census Tract Code
+    BLCK_GRPA:   Block Group Code
+    AIANHHA:     American Indian Area/Alaska Native Area/Hawaiian Home Land Code
+    AIANHHCC:    FIPS American Indian Area/Alaska Native Area/Hawaiian Home Land Class Code
+    MSACMSA:     Metropolitan Statistical Area/Consolidated Metropolitan Statistical Area
+    CMSA:        Consolidated Metropolitan Statistical Area
+    MACCI:       Metropolitan Area Central City Indicator
+    NECMA:       New England County Metropolitan Area
+    NECMACCI:    New England County Metropolitan Area Central City Indicator
+    UA:          Urban Area
+    UATYPE:      Urban Area Type
+    URBRURALA:   Urban/Rural Code
+    AREALAND:    Area (Land)
+    AREAWATR:    Area (Water)
+    NAME:        Area Name-Legal/Statistical Area Description (LSAD) Term-Part Indicator
+    FUNCSTAT:    Functional Status Code
+    INTPTLAT:    Internal Point (Latitude)
+    INTPLON:     Internal Point (Longitude)
+    LSADC:       Legal/Statistical Area Description Code
+ 
+Table 1:     Specified Renter-Occupied Housing Units with Cash Rent by Gross Rent
+Universe:    Specified Renter-Occupied Housing Units with Cash Rent
+Source code: NH062A
+NHGIS code:  G8B
+    G8B001:      Less than $100
+    G8B002:      $100 to $149
+    G8B003:      $150 to $199
+    G8B004:      $200 to $249
+    G8B005:      $250 to $299
+    G8B006:      $300 to $349
+    G8B007:      $350 to $399
+    G8B008:      $400 to $449
+    G8B009:      $450 to $499
+    G8B010:      $500 to $549
+    G8B011:      $550 to $599
+    G8B012:      $600 to $649
+    G8B013:      $650 to $699
+    G8B014:      $700 to $749
+    G8B015:      $750 to $799
+    G8B016:      $800 to $899
+    G8B017:      $900 to $999
+    G8B018:      $1,000 to $1,249
+    G8B019:      $1,250 to $1,499
+    G8B020:      $1,500 to $1,999
+    G8B021:      $2,000 or more
+ 
+--------------------------------------------------------------------------------
+Citation and Use of NHGIS Data
+--------------------------------------------------------------------------------
+ 
+All persons are granted a limited license to use this documentation and the
+accompanying data, subject to the following conditions:
+
+* REDISTRIBUTION: You will not redistribute the data without permission.
+
+  You may publish a subset of the data to meet journal requirements for accessing 
+  data related to a particular publication. Contact us for permission for any other 
+  redistribution; we will consider requests for free and commercial redistribution.
+
+* CITATION: You will cite NHGIS appropriately.
+
+    * Publications and research reports employing NHGIS data (either tabular or GIS) 
+      should include the following citation:
+
+        Steven Manson, Jonathan Schroeder, David Van Riper, Tracy Kugler, and Steven Ruggles. 
+        IPUMS National Historical Geographic Information System: Version 17.0 
+        [dataset]. Minneapolis, MN: IPUMS. 2022. 
+        http://doi.org/10.18128/D050.V17.0
+
+    * For policy briefs, online resources, or articles in the popular press, we 
+      recommend that you cite the use of NHGIS data as follows:
+
+        IPUMS NHGIS, University of Minnesota, www.nhgis.org.
+
+These terms of use are a legally binding agreement. You can use the data only in 
+accordance with these terms, and any other use is a violation of the agreement. 
+Violations may result in revocation of the agreement and prohibition from using other 
+IPUMS data. If IPUMS or our partners are harmed from your violation, you are 
+responsible for all damages, including reasonable attorney's fees and expenses.
+        
+In addition, we request that users send us a copy of any publications, research
+reports, or educational material making use of the data or documentation.
+
+Send electronic material to: nhgis@umn.edu
+
+Printed matter should be sent to:
+
+    IPUMS NHGIS
+    Institute for Social Research and Data Innovation
+    University of Minnesota
+    50 Willey Hall
+    225 19th Ave S
+    Minneapolis, MN 55455

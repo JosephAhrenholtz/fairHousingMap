@@ -1,0 +1,16 @@
+=============================================================================================================
+  TABLE INFO
+=============================================================================================================
+
+ID: DECENNIALSF32000.P052
+Title: HOUSEHOLD INCOME IN 1999 [17]
+
+=============================================================================================================
+  NOTES
+=============================================================================================================
+
+<p>NOTE: Data based on a sample except in P3, P4, H3, and H4. For
+information on confidentiality protection, sampling error,
+nonsampling error, definitions, and count corrections see
+<a href="http://www.census.gov/prod/cen2000/doc/sf3.pdf">http://www.census.gov/prod/cen2000/doc/sf3.pdf</a></p>
+

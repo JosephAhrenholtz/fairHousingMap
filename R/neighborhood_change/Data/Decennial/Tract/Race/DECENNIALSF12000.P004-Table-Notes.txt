@@ -1,0 +1,15 @@
+=============================================================================================================
+  TABLE INFO
+=============================================================================================================
+
+ID: DECENNIALSF12000.P004
+Title: HISPANIC OR LATINO, AND NOT HISPANIC OR LATINO BY RACE [73]
+
+=============================================================================================================
+  NOTES
+=============================================================================================================
+
+<p>NOTE:  For information on confidentiality protection,
+nonsampling error, definitions, and count corrections see
+<a href="http://www.census.gov/prod/cen2000/doc/sf1.pdf">http://www.census.gov/prod/cen2000/doc/sf1.pdf</a></p>
+
