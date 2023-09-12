@@ -25,20 +25,6 @@ for details on the mapping approach.
 devtools::install_dev_deps()
 ```
 
-    ## knitr (1.43 -> 1.44) [CRAN]
-    ## 
-    ##   There is a binary version available but the source version is later:
-    ##       binary source needs_compilation
-    ## knitr   1.43   1.44             FALSE
-    ## 
-    ## terra    (1.7-39 -> 1.7-46) [CRAN]
-    ## classInt (0.4-9  -> 0.4-10) [CRAN]
-    ## package 'terra' successfully unpacked and MD5 sums checked
-    ## package 'classInt' successfully unpacked and MD5 sums checked
-    ## 
-    ## The downloaded binary packages are in
-    ##  C:\Users\josephda\AppData\Local\Temp\RtmpimBVdq\downloaded_packages
-
 ``` r
 devtools::load_all()
 ```
@@ -108,16 +94,6 @@ proceed.
 shape_rural(write = F) # write = T will generate a new file
 ```
 
-    ## Simple feature collection with 1 feature and 1 field
-    ## Geometry type: MULTIPOLYGON
-    ## Dimension:     XY
-    ## Bounding box:  xmin: -124.4096 ymin: 32.53482 xmax: -114.1312 ymax: 42.00949
-    ## Geodetic CRS:  WGS 84
-    ## # A tibble: 1 × 2
-    ##   fips_state                                                            geometry
-    ## * <chr>                                                       <MULTIPOLYGON [°]>
-    ## 1 06         (((-124.2171 41.95023, -124.2162 41.94989, -124.215 41.94973, -124…
-
 ``` r
 mapview::mapview(shape_rural(write = F)) # to map the shapefile
 ```
@@ -139,21 +115,6 @@ file, tract_county_region.csv.
 create_regions(read = T) # reads the existing file, set to False to generate new
 ```
 
-    ## # A tibble: 9,129 × 7
-    ##    fips        county_name    region   rural_pct population rural_pop rural_flag
-    ##    <chr>       <chr>          <chr>        <dbl>      <dbl>     <dbl>      <dbl>
-    ##  1 06077003406 San Joaquin CA Central…     0           3769         0          0
-    ##  2 06077004402 San Joaquin CA Central…     0           5599         0          0
-    ##  3 06077004600 San Joaquin CA Rural A…     0.874       6099      5333          1
-    ##  4 06077001400 San Joaquin CA Central…     0           5015         0          0
-    ##  5 06077003106 San Joaquin CA Central…     0           3862         0          0
-    ##  6 06077001700 San Joaquin CA Central…     0           4026         0          0
-    ##  7 06077000401 San Joaquin CA Central…     0           3351         0          0
-    ##  8 06077003404 San Joaquin CA Central…     0           5849         0          0
-    ##  9 06001450200 Alameda CA     Bay Are…     0           6456         0          0
-    ## 10 06001444100 Alameda CA     Bay Are…     0           7703         0          0
-    ## # ℹ 9,119 more rows
-
 #### 04_census_data.R
 
 Contains `all_census_data`() which downloads all relevant decennial and
@@ -167,51 +128,9 @@ intermediate tract- and block group-level data.
 all_census_data(geo = 'tract', read = T, write = F) # for tracts
 ```
 
-    ## # A tibble: 9,129 × 78
-    ##    fips        countyid total_pop_2020 pct_prisoner_2020 county_name
-    ##    <chr>       <chr>             <dbl>             <dbl> <chr>      
-    ##  1 06001400100 06001              3038                 0 Alameda    
-    ##  2 06001400200 06001              2001                 0 Alameda    
-    ##  3 06001400300 06001              5504                 0 Alameda    
-    ##  4 06001400400 06001              4112                 0 Alameda    
-    ##  5 06001400500 06001              3644                 0 Alameda    
-    ##  6 06001400600 06001              1788                 0 Alameda    
-    ##  7 06001400700 06001              4508                 0 Alameda    
-    ##  8 06001400800 06001              3917                 0 Alameda    
-    ##  9 06001400900 06001              2514                 0 Alameda    
-    ## 10 06001401000 06001              6097                 0 Alameda    
-    ## # ℹ 9,119 more rows
-    ## # ℹ 73 more variables: employment_pop_2021 <dbl>,
-    ## #   moe_employment_pop_2021 <dbl>, employed_2021 <dbl>,
-    ## #   pct_employed_2021 <dbl>, total_pop_2021 <dbl>, white_2021 <dbl>,
-    ## #   black_2021 <dbl>, amer_indian_2021 <dbl>, asian_2021 <dbl>,
-    ## #   hawaiian_2021 <dbl>, other_race_2021 <dbl>, two_races_2021 <dbl>,
-    ## #   hispanic_2021 <dbl>, moe_total_pop_2021 <dbl>, moe_white_2021 <dbl>, …
-
 ``` r
 all_census_data(geo = 'bg', read = T, write = F) # for block groups
 ```
-
-    ## # A tibble: 25,607 × 79
-    ##    fips        countyid total_pop_2020 pct_prisoner_2020 fips_bg     county_name
-    ##    <chr>       <chr>             <dbl>             <dbl> <chr>       <chr>      
-    ##  1 06001400100 06001              1789                 0 0600140010… Alameda    
-    ##  2 06001400100 06001              1249                 0 0600140010… Alameda    
-    ##  3 06001400200 06001               979                 0 0600140020… Alameda    
-    ##  4 06001400200 06001              1022                 0 0600140020… Alameda    
-    ##  5 06001400300 06001              1390                 0 0600140030… Alameda    
-    ##  6 06001400300 06001              1123                 0 0600140030… Alameda    
-    ##  7 06001400300 06001              1528                 0 0600140030… Alameda    
-    ##  8 06001400300 06001              1463                 0 0600140030… Alameda    
-    ##  9 06001400400 06001              1558                 0 0600140040… Alameda    
-    ## 10 06001400400 06001              1353                 0 0600140040… Alameda    
-    ## # ℹ 25,597 more rows
-    ## # ℹ 73 more variables: employment_pop_2021 <dbl>,
-    ## #   moe_employment_pop_2021 <dbl>, employed_2021 <dbl>,
-    ## #   pct_employed_2021 <dbl>, total_pop_2021 <dbl>, white_2021 <dbl>,
-    ## #   black_2021 <dbl>, amer_indian_2021 <dbl>, asian_2021 <dbl>,
-    ## #   hawaiian_2021 <dbl>, other_race_2021 <dbl>, two_races_2021 <dbl>,
-    ## #   hispanic_2021 <dbl>, moe_total_pop_2021 <dbl>, moe_white_2021 <dbl>, …
 
 #### 05_education_data.R
 
@@ -228,21 +147,6 @@ high school graduate rates to the intermediate directory.
 graduation_rates(write = F) # set to True to generate new data
 ```
 
-    ## # A tibble: 1,638 × 8
-    ##    CDSCode    grad_rate county_name hs_drop_rate enrollment countyid   lon   lat
-    ##    <chr>          <dbl> <chr>              <dbl>      <dbl> <chr>    <dbl> <dbl>
-    ##  1 011001701…     0.928 Alameda            0.06          83 06001    -122.  37.8
-    ##  2 011001701…     0.966 Alameda            0.034         29 06001    -122.  37.6
-    ##  3 013161701…     0.483 Alameda            0.034         29 06001    -122.  37.6
-    ##  4 016111901…     1     Alameda            0             39 06001    -122.  37.8
-    ##  5 016111901…     0.918 Alameda            0.02          49 06001    -122.  37.8
-    ##  6 016111901…     0.956 Alameda            0.009        454 06001    -122.  37.8
-    ##  7 016111901…     0.895 Alameda            0.079         38 06001    -122.  37.8
-    ##  8 016111901…     0.958 Alameda            0.021        236 06001    -122.  37.8
-    ##  9 016112701…     0.916 Alameda            0.061        310 06001    -122.  37.9
-    ## 10 016114301…     0.881 Alameda            0.103        848 06001    -122.  37.9
-    ## # ℹ 1,628 more rows
-
 #### 06_education_distance.R
 
 Contains `school_distances()` which finds school distance to tract or
@@ -252,23 +156,6 @@ and graduation rates of the three nearest schools.
 ``` r
 school_distances(read = T, write = F) # set read to False, write to True to generate new data
 ```
-
-    ## # A tibble: 9,129 × 9
-    ##    fips        pct_frpm read_prof math_prof grad_rate distance_elem_avg
-    ##    <chr>          <dbl>     <dbl>     <dbl>     <dbl>             <dbl>
-    ##  1 06001400100    0.300     0.742     0.687     0.913             0.972
-    ##  2 06001400200    0.281     0.718     0.613     0.902             0.517
-    ##  3 06001400300    0.530     0.476     0.383     0.939             0.593
-    ##  4 06001400400    0.375     0.589     0.500     0.902             0.404
-    ##  5 06001400500    0.372     0.574     0.462     0.939             0.330
-    ##  6 06001400600    0.530     0.476     0.383     0.939             0.526
-    ##  7 06001400700    0.615     0.393     0.266     0.939             0.622
-    ##  8 06001400800    0.492     0.571     0.520     0.887             0.278
-    ##  9 06001400900    0.663     0.319     0.160     0.917             0.387
-    ## 10 06001401000    0.795     0.305     0.150     0.939             0.491
-    ## # ℹ 9,119 more rows
-    ## # ℹ 3 more variables: distance_elem_closest <dbl>,
-    ## #   distance_elem_farthest <dbl>, pct_not_frpm <dbl>
 
 #### 07_enviroscreen.R
 
@@ -282,22 +169,6 @@ area.
 ``` r
 xwalk_ces(read = T, write = F)
 ```
-
-    ## # A tibble: 9,107 × 8
-    ##    fips        cleanup_sites hazard_waste groundwater solid_waste env_site_mean
-    ##    <chr>               <dbl>        <dbl>       <dbl>       <dbl>         <dbl>
-    ##  1 06001400100         0.681        0.885       0.466       0.727         0.690
-    ##  2 06001400200         0            0.273       0.825       0             0.275
-    ##  3 06001400300         0.397        0.677       0.794       0             0.467
-    ##  4 06001400400         0            0.483       0.889       0             0.343
-    ##  5 06001400500         0.541        0.513       0.782       0             0.459
-    ##  6 06001400600         0.458        0.533       0.727       0             0.430
-    ##  7 06001400700         0.715        0.667       0.880       0             0.566
-    ##  8 06001400800         0.95         0.942       0.969       0             0.715
-    ##  9 06001400900         0.868        0.797       0.954       0             0.655
-    ## 10 06001401000         0.899        0.8         0.978       0             0.669
-    ## # ℹ 9,097 more rows
-    ## # ℹ 2 more variables: env_site_pctl <dbl>, env_site_score <dbl>
 
 #### 08_neighborhood_change.R
 
@@ -318,27 +189,6 @@ called and joined to the final data frame.
 ``` r
 final_opp()
 ```
-
-    ## # A tibble: 11,347 × 51
-    ##    fips        fips_bg region  regionid county_name pct_above_200_pov home_value
-    ##    <chr>       <chr>   <fct>   <chr>    <chr>                   <dbl>      <dbl>
-    ##  1 06001400100 <NA>    Bay Ar… Bay Are… Alameda                 0.891    1419200
-    ##  2 06001400200 <NA>    Bay Ar… Bay Are… Alameda                 0.913    1710400
-    ##  3 06001400300 <NA>    Bay Ar… Bay Are… Alameda                 0.892    1391300
-    ##  4 06001400400 <NA>    Bay Ar… Bay Are… Alameda                 0.854    1286700
-    ##  5 06001400500 <NA>    Bay Ar… Bay Are… Alameda                 0.733     958100
-    ##  6 06001400600 <NA>    Bay Ar… Bay Are… Alameda                 0.860    1012800
-    ##  7 06001400700 <NA>    Bay Ar… Bay Are… Alameda                 0.729     836400
-    ##  8 06001400800 <NA>    Bay Ar… Bay Are… Alameda                 0.748     777900
-    ##  9 06001400900 <NA>    Bay Ar… Bay Are… Alameda                 0.772     898600
-    ## 10 06001401000 <NA>    Bay Ar… Bay Are… Alameda                 0.883     780400
-    ## # ℹ 11,337 more rows
-    ## # ℹ 44 more variables: pct_bachelors_plus <dbl>, pct_employed <dbl>,
-    ## #   math_prof <dbl>, read_prof <dbl>, grad_rate <dbl>, pct_not_frpm <dbl>,
-    ## #   env_site_pctl <dbl>, pct_above_200_pov_median <dbl>,
-    ## #   home_value_median <dbl>, pct_bachelors_plus_median <dbl>,
-    ## #   pct_employed_median <dbl>, math_prof_median <dbl>, read_prof_median <dbl>,
-    ## #   grad_rate_median <dbl>, pct_not_frpm_median <dbl>, env_site_score <dbl>, …
 
 ``` r
 mapview::mapview(final_opp(as_geo = T), zcol = 'oppcat') # to map the output
