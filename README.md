@@ -29,6 +29,12 @@ devtools::install_dev_deps()
 devtools::load_all()
 ```
 
+### Final Dataset
+
+The final dataset can be loaded by calling `data(final_2024)`. All
+variables are documented and the data dictionary can be loaded using
+`?final_opp_data`.
+
 ### Census API
 
 1.  Register for Census API key
