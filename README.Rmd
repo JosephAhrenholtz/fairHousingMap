@@ -74,11 +74,11 @@ Contains `read_tract_centers()`, `read_block_group_centers()`, and `read_block_c
 Contains `shape_rural()` , which imports the USDA shapefile for areas ineligible for rural development housing programs, then shrinks to only California data and subtracts them from the complete California shapefile to get a rural areas shapefile. `shape_rural(write = T)`generates the first necessary intermediate file, rural_shapefile.shp, which must exist in the intermediate directory to proceed.
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-shape_rural(write = F) # write = T will generate a new file
+shape_rural(write = T) # write = T will generate a new file
 ```
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-mapview::mapview(shape_rural(write = F)) # to map the shapefile
+mapview::mapview(shape_rural(write = T)) # to map the shapefile
 ```
 
 #### **03_create_region_designation.R**
@@ -86,7 +86,8 @@ mapview::mapview(shape_rural(write = F)) # to map the shapefile
 Contains `create_regions()`, which evaluates which regions that each county belongs to, then uses `rural_overlay()` to pinpoint rural tracts. `rural_overlay()` merges block centers with the rural_shapefile, and classifies the population of any block with its centroid inside the rural shapefile as rural. It then collapses to tract level, and any tract with over 50 percent population as rural is classified as "Rural Areas." `create_regions(write = T)` generates the required intermediate file, tract_county_region.csv.
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-create_regions(read = T) # reads the existing file, set to False to generate new
+##SSN (9/12): first run needs: create_regions(write = T)
+create_regions(write = T) # reads the existing file, set to False to generate new
 ```
 
 #### 04_census_data.R
@@ -94,11 +95,11 @@ create_regions(read = T) # reads the existing file, set to False to generate new
 Contains `all_census_data`() which downloads all relevant decennial and ACS data from Census API using tidycensus, then derives percentages and calculates margins of error for derived variables. Both `all_census_data(geo = 'tract', write = T)` and `all_census_data(geo = 'bg', write = T)` are necessary to generate intermediate tract- and block group-level data.
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-all_census_data(geo = 'tract', read = T, write = F) # for tracts
+all_census_data(geo = 'tract', read = T, write = T) # for tracts
 ```
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-all_census_data(geo = 'bg', read = T, write = F) # for block groups
+all_census_data(geo = 'bg', read = T, write = T) # for block groups
 ```
 
 #### 05_education_data.R
@@ -106,7 +107,7 @@ all_census_data(geo = 'bg', read = T, write = F) # for block groups
 Contains `read_educ_pov()` which imports relevant math/reading scores and share of students receiving free or reduced priced meals (frpm). `read_educ_pov()` is called in subsequent scripts and does not produce any intermediate files. Reading/math data is weighted by total enrollment of schools that return 4th-grade test scores. FRPM data is limited to and weighted by enrollment in schools that serve elementary school students. `graduation_rates()` imports and writes cohort-weighted high school graduate rates to the intermediate directory.
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-graduation_rates(write = F) # set to True to generate new data
+graduation_rates(write = T) # set to True to generate new data
 ```
 
 #### 06_education_distance.R
@@ -114,7 +115,8 @@ graduation_rates(write = F) # set to True to generate new data
 Contains `school_distances()` which finds school distance to tract or block group centroids, and averages the reading and math scores, frpm, and graduation rates of the three nearest schools.
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-school_distances(read = T, write = F) # set read to False, write to True to generate new data
+#school_distances(read = F, write = T) # set read to False, write to True to generate new data
+school_distances(read = F, write = T, geo='bg') # set read to False, write to True to generate new data
 ```
 
 #### 07_enviroscreen.R
@@ -122,7 +124,7 @@ school_distances(read = T, write = F) # set read to False, write to True to gene
 Contains `xwalk_ces()` which imports CalEnviroScreen 4.0 site-based measurements (cleanup sites, hazardous waste, groundwater threats, solid waste) from the final 2023 TCAC file, creates a binary score for tracts in the bottom 5% of site-based hazards within regions, then crosswalks to 2020 tracts using an overlay method of \>= 5% of intersecting land area.
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-xwalk_ces(read = T, write = F)
+xwalk_ces(read = F, write = T)
 ```
 
 #### 08_neighborhood_change.R

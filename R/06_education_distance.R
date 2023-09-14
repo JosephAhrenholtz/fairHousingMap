@@ -112,7 +112,7 @@ distance_indicators <- dplyr::summarize(distance_indicators_Sch,
                                         read_prof = weighted.mean(read_prof,enrollment, na.rm = T),
                                         math_prof = weighted.mean(math_prof,enrollment, na.rm = T),
                                         grad_rate = weighted.mean(grad_rate,enrollment_hs, na.rm = T),
-                                        distance_elem_avg = meanna(distance_elem)/1609.34,
+                                        distance_elem_avg = mean(distance_elem, na.rm=TRUE)/1609.34,
                                         distance_elem_closest = min(distance_elem, na.rm = T)/1609.34,
                                         distance_elem_farthest = max(distance_elem, na.rm = T)/1609.34) # include across() as a summarize argument to keep school info
 
@@ -122,7 +122,7 @@ distance_indicators$pct_not_frpm <- 1 - distance_indicators$pct_frpm
 # distance_indicators <- dplyr::left_join(distance_indicators, graduation_rates(), by = 'fips')
 
 if(write == TRUE){
-  readr::write_csv(distance_indicators, filename)
+    readr::write_csv(distance_indicators, filename)
 }
 else distance_indicators
 }

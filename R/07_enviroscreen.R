@@ -22,7 +22,7 @@
 #' xwalk_ces(year = 2024, write = TRUE) # writes a new file to the intermediate directory
 #'
 #'
-#' @import dplyr
+#' @import dplyr readr
 #'
 #' @export
 xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
@@ -77,7 +77,7 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
 
 
   # crosswalk for 2010-2020 transformation
-  xwalk <- read_delim("https://www2.census.gov/geo/docs/maps-data/data/rel2020/tract/tab20_tract20_tract10_natl.txt", delim = "|") %>%
+  xwalk <- readr::read_delim("https://www2.census.gov/geo/docs/maps-data/data/rel2020/tract/tab20_tract20_tract10_natl.txt", delim = "|") %>%
     transmute(GEOID10 = GEOID_TRACT_10, GEOID20 = GEOID_TRACT_20,
               AREALAND20 = AREALAND_TRACT_20, AREALAND_PART20 = AREALAND_PART) %>%
     filter(substr(GEOID10, 1, 2) == "06") %>% #group_by(GEOID) %>% summarize(n = n())

@@ -63,3 +63,16 @@ testthat::test_that('formatted bgs in acs file match formatted bgs in centroid f
   testthat::expect_equal(nrow(not_joined), 0)
 })
 
+testthat::test_that('formatted tracts capture all the data in the online source',{
+  setwd(here::here())
+
+  acs <- all_census_data(geo = 'acs', read = T) %>% select(fips, fips_bg)
+  testthat::expect_equal(dim(acs)[1], 9129)
+})
+
+testthat::test_that('formatted block groups capture all the data in the online source',{
+  setwd(here::here())
+
+  acs <- all_census_data(geo = 'bg', read = T) %>% select(fips, fips_bg)
+  testthat::expect_equal(dim(acs)[1], 25607)
+})
