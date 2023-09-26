@@ -43,19 +43,24 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
     )
 
   # re-level so rural areas at level 1
-  final <- final %>%
-    mutate(region = relevel(factor(region), ref = "Rural Areas")) %>%
-    arrange(county_name, region)
+  # final <- final %>%
+  #   mutate(region = relevel(factor(region), ref = "Rural Areas")) %>%
+  #   arrange(county_name, region)
 
   # group by county and reassign rural areas to urban region if in a county with urban tracts
-  final <- final %>%
-    group_by(county_name) %>%
-    mutate(regionid = ifelse(region == "Rural Areas", last(as.character(region)), as.character(region))) %>%
-    ungroup()
+  # final <- final %>%
+  #   group_by(county_name) %>%
+  #   mutate(regionid = ifelse(region == "Rural Areas", last(as.character(region)), as.character(region))) %>%
+  #   ungroup()
 
-  # assign remaining rural block groups to their county of origin
+  # assign region id
   final <- final %>%
-    mutate(regionid = ifelse(regionid == "Rural Areas", county_name, regionid))
+    mutate(regionid = ifelse(region == "Rural Areas", county_name, region))
+
+  # for rural block groups assigned to urban region, replace "Rural Area" with region name
+  # final$region <- if_else(final$region == 'Rural Areas'&
+  #                          stringr::str_detect(final$regionid, 'Region'), final$regionid, final$region)
+
 
   # assign above/below regional median for economic/educational indicators
   final <- final %>%
@@ -65,6 +70,15 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
     # regional median values for interface charts
     mutate_at(vars(pct_above_200_pov:pct_not_frpm), list(median = median), na.rm = T) %>%
     ungroup()
+
+
+  # remove scores where less than 2 obs per indicator or less than 2 geos per region
+  final <- final %>%
+    group_by(regionid) %>%
+    mutate_at(vars(pct_above_200_pov_score:pct_not_frpm_score), function(x) case_when(sum(!is.na(x)) <= 1 ~ NA_real_, TRUE ~ x)) %>%
+    ungroup()
+
+
 
   # calculate total non-null values for each geography
   final <- final %>%
@@ -101,6 +115,10 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
   levels <- c("Highest Resource", "High Resource", "Moderate Resource", "Low Resource")
   final$oppcat <- factor(final$oppcat, levels = levels)
 
+  # add poverty and env hazard threshold for interface charts
+  final <- final %>%
+    mutate(env_site_thresh = .95, high_pov_thresh = .3, seg_thresh = 1.25)
+
 
   # join neighborhood change of non-rural tracts
   change <- read_neighborhood_change(year = year)
@@ -116,9 +134,9 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
         # geo
         starts_with('fips'), region, regionid, county_name,
         # opp indicators
-        pct_above_200_pov:pct_not_frpm, env_site_pctl, ends_with('median'), contains('score'),
+        pct_above_200_pov:pct_not_frpm, env_site_pctl, env_site_pctl_state, ends_with('median'), contains('score'), env_site_thresh,
         # pov and seg
-        pct_below_pov, starts_with('lq_'),
+        pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
         # designations
         oppcat, pov_seg_cat,
         # neighborhood change
@@ -145,7 +163,7 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
       rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
       final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
 
-      #sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
+      sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
       return(final_geo)
     }
   }
