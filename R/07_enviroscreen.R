@@ -79,10 +79,9 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
   # join statewide percentile and use for regions with less than 20 geos
   env <-  env %>%
     left_join(env_state %>% select(fips, env_site_pctl_state)) %>%
-    mutate(env_site_score = case_when(
-      n_geo >= 20 ~ env_site_score,
-      env_site_pctl_state <= 0.95 ~ 1,
-      env_site_pctl_state > 0.95 ~ 0))
+
+    mutate(env_site_score_state = ifelse(env_site_pctl_state <= 0.95, 1, 0),
+           env_site_score = ifelse(n_geo >= 20, env_site_score, env_site_score_state))
 
 
   # crosswalk for 2010-2020 transformation
@@ -92,13 +91,14 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
     filter(substr(GEOID10, 1, 2) == "06") %>% #group_by(GEOID) %>% summarize(n = n())
     mutate(AREALAND_PART20 = AREALAND_PART20/AREALAND20)
 
-  # join to 2020 crosswalk and retain tracts overlapping by >= 5% of 2020 area
+  # apply 80% 2010-2020 xwalk land area overlap threshold for scoring
   env <- env %>%
-    rename(GEOID10 = fips) %>% left_join(xwalk) %>% filter(AREALAND_PART20 >= 0.05) %>%
-    # keep only first row by tract (If site == 0 in any overlap, 2020 tract site value = 0)
-    arrange(GEOID20, env_site_score) %>% rename(fips = GEOID20) %>%
-    select(fips, cleanup_sites:solid_waste, env_site_mean, env_site_pctl, env_site_pctl_state, env_site_score) %>%
-    group_by(fips) %>% summarize_all(first) %>% ungroup()
+    rename(GEOID10 = fips) %>% left_join(xwalk) %>%
+    ## (If env_site_score == 0 in any overlap, 2020 tract env_site_score value = 0)
+    mutate(env_site_score = ifelse(AREALAND_PART20 >= 0.8 & env_site_score == 0, 0, 1)) %>%
+    select(GEOID20, env_site_score) %>%
+    group_by(GEOID20) %>% summarize(env_site_score = min(env_site_score)) %>% ungroup() %>%
+    rename('fips' = GEOID20)
 
 
   if(write == TRUE){

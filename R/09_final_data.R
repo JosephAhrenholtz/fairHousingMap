@@ -42,24 +42,10 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
            everything()
     )
 
-  # re-level so rural areas at level 1
-  # final <- final %>%
-  #   mutate(region = relevel(factor(region), ref = "Rural Areas")) %>%
-  #   arrange(county_name, region)
-
-  # group by county and reassign rural areas to urban region if in a county with urban tracts
-  # final <- final %>%
-  #   group_by(county_name) %>%
-  #   mutate(regionid = ifelse(region == "Rural Areas", last(as.character(region)), as.character(region))) %>%
-  #   ungroup()
 
   # assign region id
   final <- final %>%
     mutate(regionid = ifelse(region == "Rural Areas", county_name, region))
-
-  # for rural block groups assigned to urban region, replace "Rural Area" with region name
-  # final$region <- if_else(final$region == 'Rural Areas'&
-  #                          stringr::str_detect(final$regionid, 'Region'), final$regionid, final$region)
 
 
   # assign above/below regional median for economic/educational indicators
@@ -134,7 +120,7 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
         # geo
         starts_with('fips'), region, regionid, county_name,
         # opp indicators
-        pct_above_200_pov:pct_not_frpm, env_site_pctl, env_site_pctl_state, ends_with('median'), contains('score'), env_site_thresh,
+        pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), env_site_thresh,
         # pov and seg
         pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
         # designations
