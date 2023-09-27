@@ -19,7 +19,7 @@
 #' @importFrom geosphere distGeo
 #'
 #' @export
-school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
+school_distances <- function(year = current_year, geo = 'tract', write = FALSE, intermediate = FALSE,
   read = !write){
   filename = paste0("data/intermediate/", year,'/education_indicators_', geo, '.csv.gz')
   if(read == TRUE){
@@ -47,7 +47,6 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
     read_prof, math_prof) %>% na.omit()
   frpm <- dplyr::select(elem_schls, CDSCode, enrollment, pct_frpm, pct_freemeals,
     lat, lon)
-
 
   school_list <- vector('list', nrow(centroids))
 
@@ -99,6 +98,7 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
     school_list[[i]] <- dplyr::select(nearest, -dplyr::matches('l[oa][nt]'))
   }
 
+  #if intermediate = TRUE, return school_list to verify, otherwise continue
 
 distance_indicators_Sch <- dplyr::bind_rows(school_list)
 #group by either geographic boundary and summarize school results

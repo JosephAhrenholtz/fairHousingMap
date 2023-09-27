@@ -24,7 +24,7 @@
 #'
 #'
 #' @importFrom dplyr sym
-#' @import tidycensus
+#' @import tidycensus zip
 #'
 #'
 #' @details To use the Census APIs, sign up for an API key. Add Census API key to .Renviron profile and call it CENSUS_KEY. censusapi will use it by
@@ -107,8 +107,8 @@ read_census_data <- function(year = current_year, geo = 'tract'){
 
   # rename and calculate pct institutionalized pop
   census_table <- dplyr::transmute(raw_census_table, fips = GEOID, countyid = substr(fips,1,5),
-                                   total_pop_2020 = P1_001N,
-                                   pct_prisoner_2020 = P5_002N/total_pop_2020
+                                  total_pop_2020 = P1_001N,
+                                  pct_prisoner_2020 = P5_002N/total_pop_2020
   )
 
   if(geo == 'block group'){
@@ -123,7 +123,7 @@ read_census_data <- function(year = current_year, geo = 'tract'){
 
 #' @export
 #' @rdname all_census_data
-read_acs_data <- function(year = current_year, geo = 'tract'){
+read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = FALSE){
 
   acs_year <- year-3
 
@@ -138,6 +138,18 @@ read_acs_data <- function(year = current_year, geo = 'tract'){
   counties <- tidycensus::fips_codes %>% dplyr::filter(state == 'CA')
   counties <- counties[['county_code']]
 
+  if(testing_handle==TRUE) {
+    #return csv containing acs outcome codes and variable names
+    var_list <- read_zip(acs_variables, year,
+                    col_names = FALSE, col_types = readr::cols())
+    all_acs_vars <- as.data.frame(tidycensus::load_variables(acs_year,'acs1')) #SSN (9/27): is this the right ACS configuration we need?
+    var_list <- merge(var_list,all_acs_vars,by.x='X1',by.y='name',all.x=TRUE)
+    var_list <- as.data.frame(var_list %>% rename(code = X1,name_in_code=X2))
+
+    dir.create('data-raw//testing')
+    write.csv(var_list, file = paste0('data-raw//testing//',acs_year,'.csv'), row.names = FALSE)
+    return('Testing files generated successfully!')
+  }
 
   # download acs data
   if(geo == 'tract'){

@@ -61,6 +61,11 @@ devtools::load_all()
 -   Develop testthat test suite (in progress as of 9/4/2023).
 -   The legacy packages maptools, rgdal, and rgeos, underpinning the sp package, which is a dependency, will retire in October 2023. Replace functions that depend on sp with sf package equivalents.
 
+```{r, results='hide', message=FALSE, warning=FALSE}
+#SSN (9/27): needed to add this cell so that filepaths are called in
+filepaths()
+```
+
 ### Running the package
 
 Generating the final opportunity designations requires calling a sequence of functions in a specific order. Only functions which write intermediate files are necessary to generate a new final output.
@@ -116,7 +121,7 @@ Contains `school_distances()` which finds school distance to tract or block grou
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
 #school_distances(read = F, write = T) # set read to False, write to True to generate new data
-school_distances(read = F, write = T, geo='bg') # set read to False, write to True to generate new data
+school_distances(read = F, write = T, geo='bg') # need to generate data with geo='bg' once to generate necessary files
 ```
 
 #### 07_enviroscreen.R
