@@ -24,9 +24,11 @@ read_neighborhood_change <- function(year = current_year){
   change_all <- read_zip(nc_scores, year, col_types = readr::cols())
 
   change <- change_all %>%
-    dplyr::filter(rural_flag == 0) %>%
     dplyr::rename('fips' = tract2020) %>%
     dplyr::select(fips,
+                  rural_flag,
+                  baseline_raceinc0021,
+                  baseline_race1321,
                   nbrhood_chng,
                   trct_raceeth_chng0021,
                   trct_raceeth_chng1321,
@@ -40,6 +42,12 @@ read_neighborhood_change <- function(year = current_year){
                   rent_quarter1321,
                   trct_pctchng_medrent1321
   )
+
+  # insert NA for rural areas
+  change <- change %>%
+    mutate_at(vars(baseline_raceinc0021:trct_pctchng_medrent1321), ~
+                replace(., rural_flag == 1, NA)) %>%
+    select(-rural_flag)
 
   return(change)
 }

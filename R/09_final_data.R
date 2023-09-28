@@ -87,6 +87,7 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
                              final$density_flag == 1)] <- NA
 
 
+
   # create opportunity categories
   final <- final %>%
     mutate(oppcat = case_when(
@@ -94,12 +95,12 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
       oppscore >= -3 ~ "High Resource",
       oppscore >= -5 ~ "Moderate Resource",
       oppscore >= -9 ~ "Low Resource",
-      TRUE ~ NA_character_),
-      pov_seg_cat = ifelse(pov_seg_flag == 1,
-                           "High Poverty & Segregated", NA))
+      TRUE ~ NA_character_))
   # factor
   levels <- c("Highest Resource", "High Resource", "Moderate Resource", "Low Resource")
   final$oppcat <- factor(final$oppcat, levels = levels)
+
+
 
   # add poverty and env hazard threshold for interface charts
   final <- final %>%
@@ -119,13 +120,18 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
       select(
         # geo
         starts_with('fips'), region, regionid, county_name,
+        # basic population
+        total_pop,
+        pop_density,
         # opp indicators
         pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), env_site_thresh,
-        # pov and seg
+        # pov and seg indicators
         pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
         # designations
-        oppcat, pov_seg_cat,
+        oppcat, pov_seg_flag,
         # neighborhood change
+        baseline_raceinc0021,
+        baseline_race1321,
         nbrhood_chng,
         trct_raceeth_chng0021,
         trct_raceeth_chng1321,
