@@ -27,7 +27,7 @@
 #'
 #'
 #' @export
-final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as_geo = FALSE){
+final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo = FALSE){
 
   # load and combine urban tracts and rural block groups
   urban <- final_prepare(year, geo='tract') %>% dplyr::filter(region != 'Rural Areas')
@@ -74,31 +74,47 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
 
 
 
-  # calculate score
+  # calculate score with a baseline of 0 to account for null values (rework this so that null values are accounted for in the positive oriented version)
   final <- final %>%
-    mutate(oppscore = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE) - total,
-           oppscore = ifelse(total >= 6, oppscore, NA))
+    mutate(oppscore_zero = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE) - total,
+           oppscore_zero = ifelse(total >= 6, oppscore_zero, NA))
 
 
   # invalidate scores with density, military, or prisoner flags
-  final$oppscore[which(final$prison_flag == 1 | final$military_flag == 1 |
+  final$oppscore_zero[which(final$prison_flag == 1 | final$military_flag == 1 |
                          final$density_flag == 1)] <- NA
   final$pov_seg_flag[which(final$prison_flag == 1 | final$military_flag == 1 |
                              final$density_flag == 1)] <- NA
 
 
+  # create positive orientation for communication purposes
+  final <- final %>% mutate(oppscore = oppscore_zero + 9)
+
 
   # create opportunity categories
   final <- final %>%
     mutate(oppcat = case_when(
-      oppscore >= -1 ~ "Highest Resource",
-      oppscore >= -3 ~ "High Resource",
-      oppscore >= -5 ~ "Moderate Resource",
-      oppscore >= -9 ~ "Low Resource",
+      oppscore >= 8 ~ "Highest Resource",
+      oppscore >= 6 ~ "High Resource",
+      oppscore >= 4 ~ "Moderate Resource",
+      oppscore < 4 ~ "Low Resource",
       TRUE ~ NA_character_))
   # factor
   levels <- c("Highest Resource", "High Resource", "Moderate Resource", "Low Resource")
   final$oppcat <- factor(final$oppcat, levels = levels)
+
+
+ # create opportunity categories
+  # final <- final %>%
+  #   mutate(oppcat_zero = case_when(
+  #     oppscore_zero >= -1 ~ "Highest Resource",
+  #     oppscore_zero >= -3 ~ "High Resource",
+  #     oppscore_zero >= -5 ~ "Moderate Resource",
+  #     oppscore_zero >= -9 ~ "Low Resource",
+  #     TRUE ~ NA_character_))
+  # # factor
+  # levels <- c("Highest Resource", "High Resource", "Moderate Resource", "Low Resource")
+  # final$oppcat_zero <- factor(final$oppcat_zero, levels = levels)
 
 
 
@@ -113,7 +129,7 @@ final_opp <- function(year = current_year, write = FALSE, output = 'reduced', as
 
 
   # return reduced dataframe of map vars by default
-  if(output == 'full'){
+  if(reduced == FALSE){
     final <- final
   } else {
     final <- final %>%
