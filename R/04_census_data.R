@@ -123,7 +123,7 @@ read_census_data <- function(year = current_year, geo = 'tract'){
 
 #' @export
 #' @rdname all_census_data
-read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = FALSE){
+read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = FALSE, test_name=''){
 
   acs_year <- year-3
 
@@ -138,7 +138,7 @@ read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = F
   counties <- tidycensus::fips_codes %>% dplyr::filter(state == 'CA')
   counties <- counties[['county_code']]
 
-  if(testing_handle==TRUE) {
+  if(testing_handle==TRUE & test_name=='load') {
     #return csv containing acs outcome codes and variable names
     var_list <- read_zip(acs_variables, year,
                     col_names = FALSE, col_types = readr::cols())
@@ -209,7 +209,6 @@ read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = F
       # conditionally adjust poverty universe to control for college students in economic indicator
       pct_above_200_pov_  = ifelse(pct_college_ < 0.25,
                                    above_200_pov_/tot_pop_pov_, above_200_pov_/(tot_pop_pov_-college_pov_)),
-
       # below federal poverty
       prelim_below_pov_ = B17020_002E,
       moe_below_pov_  = B17020_002M,
@@ -242,7 +241,10 @@ read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = F
       fips = substr(fips, 1, 11))
   }
 
-
+  if(testing_handle==TRUE & test_name=='college') {
+    college_test_data <- acs_table %>% select(tot_pop_pov_,above_200_pov_,college_pov_,pct_above_200_pov_)
+    return(college_test_data)
+  }
 
   # Creating margins of error that require combining two or more variables
   MOE_list <- lapply(1:nrow(acs_table), function(i){

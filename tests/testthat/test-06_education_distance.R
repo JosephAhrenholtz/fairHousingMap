@@ -14,7 +14,6 @@
 #' @examples
 
 testthat::test_that("Each centroid is assigned three schools",{
-
+  #tests are incorporated into the main for-loop that joins nearest schools with each centroid
+  testthat::expect_no_error(school_distances(write=TRUE, testing_handle=TRUE))
 })
-
-
