@@ -163,7 +163,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
     # option to write geojson
     if(as_geo == TRUE){
-      final <- final %>% select(-ends_with('_score'))
+      #final <- final %>% select(-ends_with('_score'))
       urban <- final %>% filter(is.na(fips_bg))
       rural <- final %>% filter(!is.na(fips_bg))
 
