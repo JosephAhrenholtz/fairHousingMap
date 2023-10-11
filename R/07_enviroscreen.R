@@ -22,7 +22,7 @@
 #' xwalk_ces(year = 2024, write = TRUE) # writes a new file to the intermediate directory
 #'
 #'
-#' @import dplyr readr
+#' @import dplyr
 #'
 #' @export
 xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
@@ -37,24 +37,19 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
 
   # load last year's data and select only relevant vars
   env <- final_2023 %>% select(fips, fips_bg, region, county_name,
-                                  cleanup_sites, hazard_waste, groundwater, solid_waste)
+                               cleanup_sites, hazard_waste, groundwater, solid_waste)
+
+  # compute statewide ranking
+  env_state <- env %>%
+    distinct(fips, cleanup_sites, hazard_waste, groundwater, solid_waste) %>%
+    mutate_at(vars(cleanup_sites:solid_waste), percent_rank) %>% ungroup() %>%
+    mutate(env_site_mean_state = rowMeans(select(., cleanup_sites:solid_waste), na.rm = TRUE),
+           env_site_pctl_state = percent_rank(env_site_mean_state))
 
 
-  # re-level so rural areas within each county are first level
+  # assign region id
   env <- env %>%
-    mutate(region = relevel(factor(region), ref = "Rural Areas")) %>%
-    arrange(county_name, region)
-
-  # group by county and reassign rural areas to urban region if in a county with urban tracts
-  env <- env %>%
-    group_by(county_name) %>%
-    mutate(regionid = ifelse(region == "Rural Areas", last(as.character(region)),
-                             as.character(region))) %>%
-    ungroup()
-
-  # assign remaining rural block groups to county of origin
-  env <- env %>%
-    mutate(regionid = ifelse(regionid == "Rural Areas", county_name, regionid))
+    mutate(regionid = ifelse(region == "Rural Areas", county_name, region))
 
   # filter to tracts (from block groups)
   env <- env %>%
@@ -65,15 +60,28 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
   env <- env %>%
     group_by(regionid) %>%
     mutate_at(vars(cleanup_sites:solid_waste), percent_rank) %>% ungroup() %>%
-    mutate(env_site_mean = rowMeans(select(., cleanup_sites:solid_waste), na.rm = TRUE)) %>%
-    # additional field to feed interface chart
-    mutate(env_site_pctl = percent_rank(env_site_mean))
+    mutate(env_site_mean = rowMeans(select(., cleanup_sites:solid_waste), na.rm = TRUE),
+           env_site_pctl = percent_rank(env_site_mean))
 
-  # identify bottom 95% of site-based values
+
+
+
+
+  # identify bottom 95% of site-based values by region if n >= 20, by state if n < 20
   # note: for scoring, high site-hazard geographies receive a score of 0
   env <- env %>%
-    mutate(env_site_score = ifelse(env_site_mean <= quantile(env_site_mean, 0.95, na.rm = TRUE), 1, 0)) %>%
+    group_by(regionid) %>%
+    mutate(n_geo = n()) %>%
+    mutate(env_site_score = ifelse(n_geo >= 20 & env_site_pctl <= 0.95, 1, 0)) %>%
     ungroup()
+
+
+  # join statewide percentile and use for regions with less than 20 geos
+  env <-  env %>%
+    left_join(env_state %>% select(fips, env_site_pctl_state)) %>%
+
+    mutate(env_site_score_state = ifelse(env_site_pctl_state <= 0.95, 1, 0),
+           env_site_score = ifelse(n_geo >= 20, env_site_score, env_site_score_state))
 
 
   # crosswalk for 2010-2020 transformation
@@ -83,13 +91,14 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
     filter(substr(GEOID10, 1, 2) == "06") %>% #group_by(GEOID) %>% summarize(n = n())
     mutate(AREALAND_PART20 = AREALAND_PART20/AREALAND20)
 
-  # join to 2020 crosswalk and retain tracts overlapping by >= 5% of 2020 area
+  # apply 80% 2010-2020 xwalk land area overlap threshold for scoring
   env <- env %>%
-    rename(GEOID10 = fips) %>% left_join(xwalk) %>% filter(AREALAND_PART20 >= 0.05) %>%
-    # keep only first row by tract (If site == 0 in any overlap, 2020 tract site value = 0)
-    arrange(GEOID20, env_site_score) %>% rename(fips = GEOID20) %>%
-    select(fips, cleanup_sites:solid_waste, env_site_mean, env_site_pctl, env_site_score) %>%
-    group_by(fips) %>% summarize_all(first) %>% ungroup()
+    rename(GEOID10 = fips) %>% left_join(xwalk) %>%
+    ## (If env_site_score == 0 in any overlap, 2020 tract env_site_score value = 0)
+    mutate(env_site_score = ifelse(AREALAND_PART20 >= 0.8 & env_site_score == 0, 0, 1)) %>%
+    select(GEOID20, env_site_score) %>%
+    group_by(GEOID20) %>% summarize(env_site_score = min(env_site_score)) %>% ungroup() %>%
+    rename('fips' = GEOID20)
 
 
   if(write == TRUE){

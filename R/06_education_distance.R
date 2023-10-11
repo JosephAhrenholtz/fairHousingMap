@@ -19,8 +19,7 @@
 #' @importFrom geosphere distGeo
 #'
 #' @export
-school_distances <- function(year = current_year, geo = 'tract', write = FALSE, intermediate = FALSE,
-  read = !write, testing_handle=FALSE){
+school_distances <- function(year = current_year, geo = 'tract', write = FALSE, read = !write, testing_handle=FALSE){
   filename = paste0("data/intermediate/", year,'/education_indicators_', geo, '.csv.gz')
   if(read == TRUE){
     distance_indicators <- readr::read_csv(filename, col_types = readr::cols())
@@ -95,9 +94,9 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE, 
 
     if(testing_handle==TRUE){
       #there should be three schools under each category (elem, frpm, high)
-      testit::assert("three nearest elementary schools",sum(!is.na(nearest_one_centroid$distance_elem))==3)
-      testit::assert("three nearest high schools",sum(!is.na(nearest_one_centroid$distance_high))==3)
-      testit::assert("three nearest free or reduced-price meal schools",sum(!is.na(nearest_one_centroid$distance_frpm))==3)
+      testit::assert("three nearest elementary schools",sum(!is.na(nearest$distance_elem))==3)
+      testit::assert("three nearest high schools",sum(!is.na(nearest$distance_high))==3)
+      testit::assert("three nearest free or reduced-price meal schools",sum(!is.na(nearest$distance_frpm))==3)
     }
 
     # adding tract/block group
