@@ -17,7 +17,8 @@
 #'
 
 # capture the current year for default function years
-current_year = 2024
+#current_year = 2024
+current_year = as.numeric(strsplit(as.character(Sys.Date()),"-")[[1]][1])+1
 
 #' @export
 read_zip <- function(name, year, type = 'csv', ...) {
