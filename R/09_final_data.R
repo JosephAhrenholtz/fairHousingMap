@@ -347,14 +347,14 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
     final_prep$pct_black[which(final_prep$black_cv_flag == 1)] <- NA
     final_prep$pct_hispanic[which(final_prep$hispanic_cv_flag == 1)] <- NA
     final_prep$pct_white[which(final_prep$white_cv_flag == 1)] <- NA
-    # use white cv to invalidate poc measure bc calculated as 1 - pct_white
-    final_prep$pct_poc[which(final_prep$white_cv_flag == 1)] <- NA
+    # use white cv to invalidate poc measure bc calculated as 1 - pct_white # deciding what to do here.  Alt: sum Asian, Black, Hisp?
+    #final_prep$pct_poc[which(final_prep$white_cv_flag == 1)] <- NA
 
     # invalidate concentrated race flags with high MOEs
     final_prep$asian_conc[which(final_prep$asian_cv_flag == 1)] <- NA
     final_prep$black_conc[which(final_prep$black_cv_flag == 1)] <- NA
     final_prep$hispanic_conc[which(final_prep$hispanic_cv_flag == 1)] <- NA
-    final_prep$poc_conc[which(final_prep$white_cv_flag == 1)] <- NA
+    #final_prep$poc_conc[which(final_prep$white_cv_flag == 1)] <- NA
 
     # create racial seg flag
     final_prep <- dplyr::mutate(final_prep, racial_seg = 0)
