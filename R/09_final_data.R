@@ -150,6 +150,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
         pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'),
         # pov and seg indicators
         pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
+        asian_seg_thresh, black_seg_thresh, hispanic_seg_thresh, poc_seg_thresh,
         # designations
         oppcat, pov_seg_flag,
         # neighborhood change
@@ -269,7 +270,14 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
     final_prep$hispanic_conc[which(final_prep$lq_hispanic > 1.25)] <- 1
     final_prep$poc_conc[which(final_prep$lq_poc > 1.25)] <- 1
 
-
+    # create county specific threshold for share of each group that equates to 1.25 LQ
+    final_prep <- final_prep %>%
+      group_by(county_name) %>%
+      mutate(asian_seg_thresh = 1.25*pct_asian_cty,
+             black_seg_thresh = 1.25*pct_black_cty,
+             hispanic_seg_thresh = 1.25*pct_hispanic_cty,
+             poc_seg_thresh = 1.25*pct_poc_cty) %>%
+      ungroup()
 
   # begin applying flags
   # apply coefficient of variation test for ACS variables and suppress unreliable data
