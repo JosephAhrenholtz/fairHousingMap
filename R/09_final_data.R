@@ -150,6 +150,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
         pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'),
         # pov and seg indicators
         pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
+        pct_asian, pct_black, pct_hispanic, pct_poc,
         asian_seg_thresh, black_seg_thresh, hispanic_seg_thresh, poc_seg_thresh,
         # designations
         oppcat, pov_seg_flag,
