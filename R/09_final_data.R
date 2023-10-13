@@ -68,27 +68,34 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
   # calculate total non-null values for each geography
   final <- final %>%
-    mutate(total = rowSums(
+    mutate(total_valid = rowSums(
       transmute_at(., vars(pct_above_200_pov_score:pct_not_frpm_score, env_site_score),
                    function(x) ifelse(!is.na(x), 1, 0))))
 
 
+  # calculate positively oriented score
+  final <- final %>%
+    mutate(oppscore = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE),
+           # invalidate scores with more than 2 missing values
+           oppscore = ifelse(total_valid >= 7, oppscore, NA))
+
+
 
   # calculate score with a baseline of 0 to account for null values (rework this so that null values are accounted for in the positive oriented version)
-  final <- final %>%
-    mutate(oppscore_zero = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE) - total,
-           oppscore_zero = ifelse(total >= 6, oppscore_zero, NA))
+  # final <- final %>%
+  #   mutate(oppscore_zero = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE) - total,
+  #          oppscore_zero = ifelse(total >= 6, oppscore_zero, NA))
 
 
   # invalidate scores with density, military, or prisoner flags
-  final$oppscore_zero[which(final$prison_flag == 1 | final$military_flag == 1 |
+  final$oppscore[which(final$prison_flag == 1 | final$military_flag == 1 |
                          final$density_flag == 1)] <- NA
   final$pov_seg_flag[which(final$prison_flag == 1 | final$military_flag == 1 |
                              final$density_flag == 1)] <- NA
 
 
   # create positive orientation for communication purposes
-  final <- final %>% mutate(oppscore = oppscore_zero + 9)
+  #final <- final %>% mutate(oppscore = oppscore_zero + 9)
 
 
   # create opportunity categories
@@ -120,7 +127,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
   # add poverty and env hazard threshold for interface charts
   final <- final %>%
-    mutate(env_site_thresh = .95, high_pov_thresh = .3, seg_thresh = 1.25)
+    mutate(high_pov_thresh = .3, seg_thresh = 1.25)
 
 
   # join neighborhood change of non-rural tracts
@@ -140,7 +147,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
         total_pop,
         pop_density,
         # opp indicators
-        pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), env_site_thresh,
+        pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'),
         # pov and seg indicators
         pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
         # designations
