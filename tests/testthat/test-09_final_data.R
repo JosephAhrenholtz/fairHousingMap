@@ -53,3 +53,17 @@ testthat::test_that("Ensure score’s align with resource designations",{
   testthat::expect_true(all(final_opp[(final_opp$oppscore>=4 & final_opp$oppscore<6),c("oppcat")]=="Moderate Resource",na.rm=TRUE))
   testthat:expect_true(all(final_opp[final_opp$oppscore<4,c("oppcat")]=="Low Resource",na.rm=TRUE))
 })
+
+testthat::test_that("Ensure all neighborhood change indicators brought in using read_neighborhood_change() are null in rural areas",{
+  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+  rural_obs <- dim(final_opp[final_opp$region=="Rural Areas",])[1]
+  for(var_name in c("baseline_raceinc0021", "baseline_race1321", "part1", "part2", "nbrhood_chng", "trct_raceeth_chng0021",
+                    "trct_raceeth_chng1321", "trct_inc_chng0021", "trct_inc_chng1321", "halfmile_buffer", "raceeth_half0021",
+                    "raceeth_half1321", "inc_half0021", "inc_half1321", "rent_quarter1321", "trct_pctchng_medrent1321")){
+    null_obs_for_that_var <- sum(is.na((final_opp[final_opp$region=="Rural Areas",c(var_name)])))
+    #print(null_obs_for_that_var)
+    testthat::expect_equal(null_obs_for_that_var,null_obs_for_that_var)
+  }
+})
+
+
