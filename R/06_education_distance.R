@@ -99,6 +99,11 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE, 
       testit::assert("three nearest free or reduced-price meal schools",sum(!is.na(nearest$distance_frpm))==3)
     }
 
+    if(testing_handle==TRUE){
+      testit::assert("all schools are unique",length(unique(nearest$CDSCode))==dim(nearest)[1])
+    }
+
+
     # adding tract/block group
     if(geo == 'tract') nearest$fips <- row$fips
     else nearest$fips_bg <- row$fips_bg

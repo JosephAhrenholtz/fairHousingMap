@@ -60,7 +60,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
   # remove scores where less than 2 obs per indicator or less than 2 geos per region
   final <- final %>%
-    group_by(regionid) %>%
+    group_by(regionid,county_name) %>%
     mutate_at(vars(pct_above_200_pov_score:pct_not_frpm_score), function(x) case_when(sum(!is.na(x)) <= 1 ~ NA_real_, TRUE ~ x)) %>%
     ungroup()
 

@@ -41,3 +41,10 @@ testthat::test_that('.zip files for yearly data exist', {
   expect_that(file.exists('data-raw/2023.zip'),is_true())
   expect_that(file.exists('data-raw/2024.zip'),is_true())
 })
+
+testthat::test_that('.zip files for yearly data exist', {
+  setwd(here::here())
+
+  expect_that(dir('output'),is_true())
+  expect_that(file.exists(paste0('output/',current_year)),is_true())
+})

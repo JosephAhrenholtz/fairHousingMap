@@ -66,4 +66,40 @@ testthat::test_that("Ensure all neighborhood change indicators brought in using 
   }
 })
 
+testthat::test_that("Ensure minimum of two observations per indicator to calculate a median for a region/rural county (regionid)",{
+  final_opp <- final_opp(write=TRUE,reduced=FALSE)
 
+  #create columns containing count of regionid-wise null values
+  final_opp <- final_opp %>%
+    group_by(regionid) %>%
+    mutate_at(vars(pct_above_200_pov_score:pct_not_frpm_score), list(nulls = function(x) sum(is.na(x)))) %>% ungroup()
+
+  testthat::expect_true(unique(final_opp$pct_above_200_pov_score_nulls==0))
+  testthat::expect_true(unique(final_opp$home_value_score_nulls==0))
+  testthat::expect_true(unique(final_opp$pct_bachelors_plus_score_nulls==0))
+  testthat::expect_true(unique(final_opp$pct_employed_score_nulls==0))
+  testthat::expect_true(unique(final_opp$math_prof_score_nulls==0))
+  testthat::expect_true(unique(final_opp$read_prof_score_nulls==0))
+  testthat::expect_true(unique(final_opp$grad_rate_score_nulls==0))
+  testthat::expect_true(unique(final_opp$pct_not_frpm_score_nulls==0))
+})
+
+testthat::test_that("Ensure minimum of two observations per indicator to calculate a median for a region/rural county (regionid)",{
+  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+
+  #create columns containing count of regionid-wise null values
+  region_counts <- final_opp %>%
+    group_by(regionid,county_name) %>%
+    summarise(count=n()) %>% ungroup()
+
+  #assert that oppcat is NA when there are < 2 observations (those regions are in the skip_region dataframe)
+  skip_region <- region_counts[region_counts$count<2,]
+  skip_region$combined_location_id <- paste0(skip_region$regionid,"-",skip_region$county_name)
+
+  #generate same id in final_opp
+  final_opp$combined_location_id <- paste0(final_opp$regionid,"-",final_opp$county_name)
+
+  for(location_id in skip_region$combined_location_id) {
+    testthat::expect_true(is.na(final_opp[final_opp$combined_location_id==location_id,c('oppcat')]))
+  }
+})
