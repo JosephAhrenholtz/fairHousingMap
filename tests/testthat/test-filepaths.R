@@ -15,36 +15,34 @@
 
 testthat::test_that('data-raw exists in root', {
   setwd(here::here())
-
-  expect_that(dir.exists('data-raw'),is_true())
+  testthat::expect_true(dir.exists('data-raw'))
 })
 
 testthat::test_that('R exists inside data-raw', {
   setwd(here::here())
-
-  expect_that(dir.exists('data-raw/R'),is_true())
+  testthat::expect_true(dir.exists('data-raw/R'))
 })
 
-testthat::test_that('shapefile exists inside data-raw', {
+testthat::test_that('shapefiles exists inside data-raw', {
   setwd(here::here())
 
-  expect_that(dir.exists('data-raw/shapefile'),is_true())
-})
-
-testthat::test_that('.zip files for yearly data exist', {
-  setwd(here::here())
-
-  expect_that(file.exists('data-raw/2019.zip'),is_true())
-  expect_that(file.exists('data-raw/2020.zip'),is_true())
-  expect_that(file.exists('data-raw/2021.zip'),is_true())
-  expect_that(file.exists('data-raw/2022.zip'),is_true())
-  expect_that(file.exists('data-raw/2023.zip'),is_true())
-  expect_that(file.exists('data-raw/2024.zip'),is_true())
+  testthat::expect_true(dir.exists('data-raw/shapefiles'))
 })
 
 testthat::test_that('.zip files for yearly data exist', {
   setwd(here::here())
 
-  expect_that(dir('output'),is_true())
-  expect_that(file.exists(paste0('output/',current_year)),is_true())
+  testthat::expect_true(file.exists('data-raw/2019.zip'))
+  testthat::expect_true(file.exists('data-raw/2020.zip'))
+  testthat::expect_true(file.exists('data-raw/2021.zip'))
+  testthat::expect_true(file.exists('data-raw/2022.zip'))
+  testthat::expect_true(file.exists('data-raw/2023.zip'))
+  testthat::expect_true(file.exists('data-raw/2024.zip'))
+})
+
+testthat::test_that('Output directory, and sub-directory for current year exists in it', {
+  setwd(here::here())
+
+  testthat::expect_true(dir.exists('output'))
+  testthat::expect_true(dir.exists(paste0('output/',current_year)))
 })

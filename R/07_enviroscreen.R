@@ -25,7 +25,7 @@
 #' @import dplyr
 #'
 #' @export
-xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
+xwalk_ces <- function(year = current_year, write = FALSE, read = !write, testing_handle=FALSE) {
   filepaths(year = year)
 
 
@@ -64,7 +64,9 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
            env_site_pctl = percent_rank(env_site_mean))
 
 
-
+  if(testing_handle==TRUE){
+    return(env)
+  }
 
 
   # identify bottom 95% of site-based values by region if n >= 20, by state if n < 20

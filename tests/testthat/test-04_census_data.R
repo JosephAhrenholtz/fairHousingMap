@@ -21,19 +21,20 @@ testthat::test_that("Output dataframe's dimension is as expected",{
   setwd(here::here())
 
   read_acs_data_output <- read_acs_data()
-  testthat::expect_true(read_acs_data_output[1],9129) #9129 rows
-  testthat::expect_true(read_acs_data_output[2],72) #72 columns
+  testthat::expect_equal(dim(read_acs_data_output)[1],9129) #9129 rows
+  testthat::expect_equal(dim(read_acs_data_output)[2],72) #72 columns
 })
 
 testthat::test_that("All outcomes labeled as being a percentage are actually a percentage",{
   setwd(here::here())
 
+  read_acs_data_output <- read_acs_data()
   all_pct_outcomes <- read_acs_data_output %>% select(contains("pct"))
   all_pct_outcomes <- all_pct_outcomes %>% select(!contains("moe"))
   testthat::expect_false(any(all_pct_outcomes > 1, na.rm=TRUE))
 })
 
-testthat::test_that("If the percentage of college students in a population is 25%+, poverty estimates are adjusted (test_name: college)",{
+testthat::test_that("If the percentage of college students in a population is 25%+, poverty estimates are adjusted (test name: college)",{
   #Logic: download census variables again to derive a new poverty estimate that's adjusted for college population
   #       confirm test matches original data
   setwd(here::here())
@@ -48,16 +49,19 @@ testthat::test_that("If the percentage of college students in a population is 25
   #above 200 pov population
   above_200_pov_ = pov_test_data[, grepl( "above_200_pov_" , names( pov_test_data ))][1]
   #total population
-  tot_pop_pov_ = pov_test_data[, grepl( "tot_pop_pvov" , names( pov_test_data ))][1]
+  tot_pop_pov_ = pov_test_data[, grepl( "tot_pop_pov_" , names( pov_test_data ))][1]
   #percentage above 200 pov
   pct_above_200_pov_ = pov_test_data[, grepl( "pct_above_200_pov_" , names( pov_test_data ))][1]
+  #college poverty
+  college_pov_ = pov_test_data[, grepl( "college_pov_" , names( pov_test_data ))][1]
 
-  if(pct_college_ < 0.25) {
-    testthat::expect_that(above_200_pov_/tot_pop_pov_ != pct_above_200_pov_)
-  } else {
-    testthat::expect_equal(above_200_pov_/tot_pop_pov_,pct_above_200_pov_)
-  }
+  college_pct_low <- pov_test_data[pov_test_data$pct_college_ < 0.25,]
+  college_pct_high <- pov_test_data[pov_test_data$pct_college_ >= 0.25,]
 
+  college_pct_low %>% select('above_200_pov_')
+
+  testthat::expect_equal(college_pct_low$above_200_pov_/college_pct_low$tot_pop_pov_,college_pct_low$pct_above_200_pov_)
+  testthat::expect_equal(college_pct_high$pct_above_200_pov_,college_pct_high$above_200_pov_/(college_pct_high$tot_pop_pov_-college_pct_high$college_pov_))
 })
 
 testthat::test_that("All variables that we expect to load are actually loaded, and correctly (test name: load)",{

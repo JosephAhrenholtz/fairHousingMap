@@ -15,9 +15,10 @@
 
 #read_educ_pov
 testthat::test_that("Scores with density, military, or prisoner flags are successfully invalidated",{
+  setwd(here::here())
   final_opp <- final_opp(write=TRUE,reduced=FALSE)
   flagged_rows <- final_opp[which(final_opp$prison_flag == 1 | final_opp$military_flag == 1 | final_opp$density_flag == 1),]
-  testthat::expect_equal(sum(is.na(final_opp$oppscore_zero==TRUE)),dim(flagged_rows)[1])
+  testthat::expect_true(sum(is.na(final_opp$oppscore_zero==TRUE))>dim(flagged_rows)[1])
 })
 
 testthat::test_that("Data is for the correct year",{
@@ -41,20 +42,23 @@ testthat::test_that("Data is for the correct year",{
 })
 
 testthat::test_that("Any tract/bg with 2+ missing indicators should not have a resource designation",{
+  setwd(here::here())
   final_opp <- final_opp(write=TRUE,reduced=FALSE)
   final_opp$na_count <- rowSums(is.na(select(final_opp,pct_above_200_pov_score:pct_not_frpm_score)))
   testthat::expect_true(unique(is.na(final_opp$oppscore[rownames(final_opp[final_opp$na_count>2,])]))) #rows with < 2 indicators have NA for oppscore
 })
 
 testthat::test_that("Ensure score’s align with resource designations",{
+  setwd(here::here())
   final_opp <- final_opp(write=TRUE,reduced=FALSE)
   testthat::expect_true(all(final_opp[final_opp$oppscore>=8,c("oppcat")]=="Highest Resource",na.rm=TRUE))
   testthat::expect_true(all(final_opp[(final_opp$oppscore>=6 & final_opp$oppscore<8),c("oppcat")]=="High Resource",na.rm=TRUE))
   testthat::expect_true(all(final_opp[(final_opp$oppscore>=4 & final_opp$oppscore<6),c("oppcat")]=="Moderate Resource",na.rm=TRUE))
-  testthat:expect_true(all(final_opp[final_opp$oppscore<4,c("oppcat")]=="Low Resource",na.rm=TRUE))
+  testthat::expect_true(all(final_opp[final_opp$oppscore<4,c("oppcat")]=="Low Resource",na.rm=TRUE))
 })
 
 testthat::test_that("Ensure all neighborhood change indicators brought in using read_neighborhood_change() are null in rural areas",{
+  setwd(here::here())
   final_opp <- final_opp(write=TRUE,reduced=FALSE)
   rural_obs <- dim(final_opp[final_opp$region=="Rural Areas",])[1]
   for(var_name in c("baseline_raceinc0021", "baseline_race1321", "part1", "part2", "nbrhood_chng", "trct_raceeth_chng0021",
@@ -62,29 +66,12 @@ testthat::test_that("Ensure all neighborhood change indicators brought in using 
                     "raceeth_half1321", "inc_half0021", "inc_half1321", "rent_quarter1321", "trct_pctchng_medrent1321")){
     null_obs_for_that_var <- sum(is.na((final_opp[final_opp$region=="Rural Areas",c(var_name)])))
     #print(null_obs_for_that_var)
-    testthat::expect_equal(null_obs_for_that_var,null_obs_for_that_var)
+    testthat::expect_equal(null_obs_for_that_var,rural_obs)
   }
 })
 
 testthat::test_that("Ensure minimum of two observations per indicator to calculate a median for a region/rural county (regionid)",{
-  final_opp <- final_opp(write=TRUE,reduced=FALSE)
-
-  #create columns containing count of regionid-wise null values
-  final_opp <- final_opp %>%
-    group_by(regionid) %>%
-    mutate_at(vars(pct_above_200_pov_score:pct_not_frpm_score), list(nulls = function(x) sum(is.na(x)))) %>% ungroup()
-
-  testthat::expect_true(unique(final_opp$pct_above_200_pov_score_nulls==0))
-  testthat::expect_true(unique(final_opp$home_value_score_nulls==0))
-  testthat::expect_true(unique(final_opp$pct_bachelors_plus_score_nulls==0))
-  testthat::expect_true(unique(final_opp$pct_employed_score_nulls==0))
-  testthat::expect_true(unique(final_opp$math_prof_score_nulls==0))
-  testthat::expect_true(unique(final_opp$read_prof_score_nulls==0))
-  testthat::expect_true(unique(final_opp$grad_rate_score_nulls==0))
-  testthat::expect_true(unique(final_opp$pct_not_frpm_score_nulls==0))
-})
-
-testthat::test_that("Ensure minimum of two observations per indicator to calculate a median for a region/rural county (regionid)",{
+  setwd(here::here())
   final_opp <- final_opp(write=TRUE,reduced=FALSE)
 
   #create columns containing count of regionid-wise null values

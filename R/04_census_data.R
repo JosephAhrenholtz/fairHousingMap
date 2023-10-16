@@ -242,7 +242,7 @@ read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = F
   }
 
   if(testing_handle==TRUE & test_name=='college') {
-    college_test_data <- acs_table %>% select(tot_pop_pov_,above_200_pov_,college_pov_,pct_above_200_pov_)
+    college_test_data <- acs_table %>% select(pct_college_, tot_pop_pov_,above_200_pov_,college_pov_,pct_above_200_pov_)
     return(college_test_data)
   }
 

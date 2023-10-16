@@ -97,9 +97,6 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE, 
       testit::assert("three nearest elementary schools",sum(!is.na(nearest$distance_elem))==3)
       testit::assert("three nearest high schools",sum(!is.na(nearest$distance_high))==3)
       testit::assert("three nearest free or reduced-price meal schools",sum(!is.na(nearest$distance_frpm))==3)
-    }
-
-    if(testing_handle==TRUE){
       testit::assert("all schools are unique",length(unique(nearest$CDSCode))==dim(nearest)[1])
     }
 
