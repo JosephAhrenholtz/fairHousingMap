@@ -74,19 +74,35 @@ testthat::test_that("Ensure minimum of two observations per indicator to calcula
   setwd(here::here())
   final_opp <- final_opp(write=TRUE,reduced=FALSE)
 
+  #generate handle for regionid-wise row count
+  region_wise_counts <- final_opp %>%
+    group_by(regionid) %>%
+    summarise(count_of_rows=n()) %>%
+    ungroup()
+
+  final_opp <- merge(final_opp,region_wise_counts,by='regionid')
+
+  trimmed_final_opp <- final_opp[final_opp$count_of_rows<2,]
+  outcome_list <- names(final_opp)[grepl("_median",names(final_opp))]
+  for(outcome in outcome_list){
+    testthat::expect_true(is.na(trimmed_final_opp %>% select(all_of(outcome))))
+  }
+})
+
+#this test also ensures the minimum two observation rule per indicator but the former is closer to the language/angle in the documentation (testing count of indicators instead of geographies)
+testthat::test_that("Ensure there’s at least two geographies within a region/rural county to assign a resource designation",{
+  setwd(here::here())
+  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+
   #create columns containing count of regionid-wise null values
   region_counts <- final_opp %>%
-    group_by(regionid,county_name) %>%
+    group_by(regionid) %>%
     summarise(count=n()) %>% ungroup()
 
-  #assert that oppcat is NA when there are < 2 observations (those regions are in the skip_region dataframe)
+  #assert that oppcat is NA when there are < 2 observations for a region
   skip_region <- region_counts[region_counts$count<2,]
-  skip_region$combined_location_id <- paste0(skip_region$regionid,"-",skip_region$county_name)
 
-  #generate same id in final_opp
-  final_opp$combined_location_id <- paste0(final_opp$regionid,"-",final_opp$county_name)
-
-  for(location_id in skip_region$combined_location_id) {
-    testthat::expect_true(is.na(final_opp[final_opp$combined_location_id==location_id,c('oppcat')]))
+  for(location_id in skip_region$regionid) {
+    testthat::expect_true(is.na(final_opp[final_opp$regionid==location_id,c('oppcat')]))
   }
 })

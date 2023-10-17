@@ -14,6 +14,7 @@
 #' @examples
 
 testthat::test_that("Each centroid is assigned three schools",{
+  setwd(here::here())
   #tests are incorporated into the main for-loop that joins nearest schools with each centroid
   testthat::expect_warning(school_distances(year=current_year, write=TRUE, testing_handle=TRUE))
 })

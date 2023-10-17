@@ -26,11 +26,7 @@ testthat::test_that("All tracts in manually designated counties are correctly de
   setwd(here::here())
 
   tract_count_region <- create_regions(read = T)
-  rural_counties <- c('Alpine', 'Amador', 'Calaveras', 'Colusa', 'Del Norte',
-                      'Glenn', 'Humboldt', 'Inyo', 'Lake', 'Lassen', 'Mariposa', 'Mendocino',
-                      'Modoc', 'Mono', 'Nevada', 'Plumas', 'Sierra', 'Siskiyou', 'Tehama', 'Trinity',
-                      'Tuolumne', 'Butte', 'Shasta', 'Sutter', 'Yuba')
-  rural_counties <- paste(rural_counties, 'CA')
+  rural_counties <- create_regions(testing_handle=TRUE)
   subset <- as.data.frame(tract_count_region[tract_count_region$county_name %in% rural_counties == TRUE,])
   testthat::expect_true(all(subset$rural_flag == 1))
 })

@@ -64,7 +64,11 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
     mutate_at(vars(pct_above_200_pov_score:pct_not_frpm_score), function(x) case_when(sum(!is.na(x)) <= 1 ~ NA_real_, TRUE ~ x)) %>%
     ungroup()
 
-
+  # remove medians where less than 2 obs per indicator or less than 2 geos per region
+  final <- final %>%
+    group_by(regionid,county_name) %>%
+    mutate_at(vars(pct_above_200_pov_median:pct_not_frpm_median), function(x) case_when(sum(!is.na(x)) <= 1 ~ NA_real_, TRUE ~ x)) %>%
+    ungroup()
 
   # calculate total non-null values for each geography
   final <- final %>%
