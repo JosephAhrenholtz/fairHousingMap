@@ -300,7 +300,7 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
                              final_prep$cvemp > 30)] <- 1
   final_prep$homeflag[which(final_prep$home_value == 0 | is.na(final_prep$home_value) |
                               final_prep$cvhomevalue > 30)] <- 1
-  final_prep$conpovcv[which(final_prep$pct_below_pov == 0 | is.na(final_prep$pct_below_pov) |
+  final_prep$conpovcv[which(is.na(final_prep$pct_below_pov) |
                               final_prep$cvpov > 30)] <- 1
 
 
@@ -366,8 +366,7 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
     final_prep$conpovflag <- ifelse(final_prep$pct_below_pov >= 0.3, 1, 0)
     final_prep$pov_seg_flag <- ifelse((final_prep$racial_seg == 1 &
                                     final_prep$conpovflag == 1), 1, 0)
-    # invalidate high cv pov/seg flags
-    final_prep$pov_seg_flag[which(final_prep$conpovcv == 1)] <- NA
+
 
 
 
