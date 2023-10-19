@@ -69,15 +69,15 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
     group_by(regionid) %>%
     mutate_at(vars(pct_above_200_pov:pct_not_frpm), list(valid = function(x) sum(!is.na(x)))) %>%
     ungroup()
-  # assign an out of bounds value  so medians are not displayed
-  final$pct_above_200_pov_median[which(final$pct_above_200_pov_valid < 2)] <- 1.5
-  final$home_value_median[which(final$home_value_valid < 2)] <- 1.5
-  final$pct_bachelors_plus_median[which(final$pct_bachelors_plus_valid < 2)] <- 1.5
-  final$pct_employed_median[which(final$pct_employed_valid < 2)] <- 1.5
-  final$math_prof_median[which(final$math_prof_valid < 2)] <- 1.5
-  final$read_prof_median[which(final$read_prof_valid < 2)] <- 1.5
-  final$grad_rate_median[which(final$grad_rate_valid < 2)] <- 1.5
-  final$pct_not_frpm_median[which(final$pct_not_frpm_valid < 2)] <- 1.5
+
+  final$pct_above_200_pov_median[which(final$pct_above_200_pov_valid < 2)] <- NA
+  final$home_value_median[which(final$home_value_valid < 2)] <- NA
+  final$pct_bachelors_plus_median[which(final$pct_bachelors_plus_valid < 2)] <- NA
+  final$pct_employed_median[which(final$pct_employed_valid < 2)] <- NA
+  final$math_prof_median[which(final$math_prof_valid < 2)] <- NA
+  final$read_prof_median[which(final$read_prof_valid < 2)] <- NA
+  final$grad_rate_median[which(final$grad_rate_valid < 2)] <- NA
+  final$pct_not_frpm_median[which(final$pct_not_frpm_valid < 2)] <- NA
 
 
   # calculate total non-null values for each geography
