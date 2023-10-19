@@ -171,6 +171,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
         # neighborhood change
         baseline_raceinc0021,
         baseline_race1321,
+        baseline_income1321,
         part1,
         part2,
         nbrhood_chng,
