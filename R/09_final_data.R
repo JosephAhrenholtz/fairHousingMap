@@ -197,7 +197,11 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
       rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
       final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
 
-      sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
+      if(write == TRUE){
+        sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
+      }
+
+
       return(final_geo)
     }
   }
