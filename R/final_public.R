@@ -34,6 +34,46 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
     'pov_seg_flag'
     )
 
+  description <- c(
+    'Census Tract ID', 'Census Block Group ID', 'County Name', 'Region',
+    'Tract/block group percentage of population with income above 200% of federal poverty line ',
+    'Tract/block group percentage of adults with a bachelors degree or above',
+    'Tract/block group percentage of adults aged 20-64 who are employed in the civilian labor force or in the armed forces',
+    'Tract/block group median value of owner-occupied units ',
+    'Tract/block group percentage of 4th graders who meet or exceed math proficiency standards',
+    'Tract/block group percentage of 4th graders who meet or exceed literacy standards',
+    'Tract/block group percentage of high school cohort that graduated on time',
+    'Tract/block group percentage of students not receiving free or reduced-price lunch',
+
+    'Regional median percentage of population with income above 200% of federal poverty line ',
+    'Regional median percentage of adults with a bachelors degree or above',
+    'Regional median percentage of adults aged 20-64 who are employed in the civilian labor force or in the armed forces',
+    'Regional median value of owner-occupied units ',
+    'Regional median percentage of 4th graders who meet or exceed math proficiency standards',
+    'Regional median percentage of 4th graders who meet or exceed literacy standards',
+    'Regional median percentage of high school cohort that graduated on time',
+    'Regional median percentage of students not receiving free or reduced-price lunch',
+
+    'Binary flag identifying tracts/block groups with highest 5% of regional environmental burden',
+
+    'Final Opportunity Score', 'Opportunity Category',
+
+    'Tract percentage of population with income below the federal poverty line',
+    'Tract percentage of Asian population',
+    'Tract percentage of Black population',
+    'Tract percentage of Hispanic Population',
+    'Tract percentage of all persons of color (POC)',
+    'County percentage of Asian population',
+    'County percentage of Black population',
+    'County percentage of Hispanic Population',
+    'County percentage of all persons of color (POC)',
+    'Binary flag identifying tracts that meet standards for both concentrated poverty (defined as 30% of the population below the federal poverty line) and racial segregation (overrepresentation of Black, Hispanic, Asian, or all people of color relative to the county)'
+
+  )
+  # dict
+  name <- public_columns
+  opp_dict <- data.frame(name, description)
+
   final_public <- dplyr::select(final, public_columns)
 
 
@@ -124,7 +164,8 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
     # create public shapefile version of data
     shp_public <- final %>% select(public_columns) %>% inner_join(geo, by = c('fips', 'fips_bg'))
     sf::st_write(shp_public, paste0("output/", year, '/final_opp_', year, '_public.gpkg'), quiet = TRUE, delete_dsn=T)
-
+    # write dict
+    readr::write_csv(opp_dict, paste0('output/',year, '/final_opp_', year, '_dictionary.csv'))
 
 
 
@@ -156,6 +197,33 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
                           'rent_quarter1321',
                           'part2',
                           'nbrhood_chng')
+
+      description <- c(
+        'Census Tract ID',
+        'County Name',
+        'Binary flag if tract was a LMI and BIPOC neighborhood in 2000',
+        'Percentage point change in tract non-Hispanic white population between 2000 and 2021',
+        'Percentage point change in tract above-moderate-income households between 2000 and 2021',
+        'Countywide 50% threshold for non-Hispanic white tract-level percentage point increase between 2000 and 2021',
+        'Countywide 50% threshold for above-moderate-income households tract-level percentage point increase between 2000 and 2021',
+        'Tract that meets both racial/ethnic change and economic change between 2000 and 2021',
+        'Binary flag if a tract population-weighted centroid is within 1/2-mile of the population-weighted centroid of a tract that meets Part 1',
+        'Binary flag if tract was a BIPOC neighborhood in 2013',
+        'Binary flag if tract was a LMI neighborhood in 2013',
+        'Percentage point change in tract non-Hispanic white population between 2013 and 2021',
+        'Percentage point change in tract above-moderate-income households between 2013 and 2021',
+        'Percent change in tract median rent between 2013 and 2021',
+        'Countywide 50% threshold for non-Hispanic white tract-level percentage point increase between 2013 and 2021',
+        'Countywide 50% threshold for above-moderate-income households tract-level percentage point increase between 2013 and 2021',
+        'Countywide top 25% threshold for % change in median rent between 2013 and 2021',
+        'Binary flag if a tract that is within 1/2-mile of population-weighted tract centroid that meets Part 1 and has rising rents, and experienced either racial/ethnic or economic change between 2013 and 2021',
+        'Binary flag if a tract meets the definition of neighborhood change (Part 1 or Part 2)'
+
+      )
+
+      # dict
+      name <- change_columns
+      change_dict <- data.frame(name, description)
 
       # create neighborhood change workbook
       change_public <- final %>%
@@ -258,6 +326,7 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
       geo_tract <- geo %>% filter(is.na(fips_bg)) %>% select(-fips_bg)
       change_shp_public <- change_shp_public %>% inner_join(geo_tract, by = 'fips')
       sf::st_write(change_shp_public, paste0("output/", year, '/final_change_', year, '_public.gpkg'), quiet = TRUE, delete_dsn=T)
+      readr::write_csv(change_dict, paste0("output/", year, '/final_change_', year, '_dictionary.csv'))
 
 }
 
