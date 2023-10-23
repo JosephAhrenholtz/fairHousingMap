@@ -1,9 +1,20 @@
-#'Generates the public summary files
+#'Generates public summary files
 #'
 #'
-#' @inheritParams final_TCAC
+#' @description
+#' Loads final opportunity and neighborhood change data and creates excel workbook summary files, shapefiles, and data dictionaries
 #'
-#' @importFrom readr read_csv cols
+#' @param year designates the map year's filepaths
+#' @param write whether to write new opportunity summary files
+#' @param change whether to write new change summary files
+#'
+#' #' @examples
+#' final_opp_public(year = 2024, write = TRUE, change = TRUE)
+#'
+#' @import dplyr
+#' @import sf
+#' @import readr
+#' @import openxlsx
 #'
 
 
@@ -145,7 +156,7 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
     #create excel style and save
 
     wb <- openxlsx::createWorkbook(title = paste(year, 'CTCAC/HCD Opportunity Map Summary File'))
-    colwidths <- c(16,19,10,10,13,16,16)
+    colwidths <- rep(20, ncols)
 
     hs <- openxlsx::createStyle(textDecoration = "BOLD", fontColour = "#FFFFFF", fontSize=12,
                                 fgFill = "#969696")
@@ -157,25 +168,17 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
       else openxlsx::setColWidths(wb, sheet = i, cols = 1:(ncols-1), widths = colwidths[-region_col])
     }
 
+    # write opportunity summary files
     openxlsx::saveWorkbook(wb,
       paste0('output/',year, '/final_opp_', year, '_public.xlsx'),
       overwrite = TRUE)
-
-    # create public shapefile version of data
     shp_public <- final %>% select(public_columns) %>% inner_join(geo, by = c('fips', 'fips_bg'))
     sf::st_write(shp_public, paste0("output/", year, '/final_opp_', year, '_public.gpkg'), quiet = TRUE, delete_dsn=T)
-    # write dict
     readr::write_csv(opp_dict, paste0('output/',year, '/final_opp_', year, '_dictionary.csv'))
 
 
-
-
-
-
+    # option to write summary files for neighborhood change
     if(change == TRUE){
-
-
-
       change_columns <- c('fips',
                           'county_name',
                           # part 1
@@ -302,7 +305,7 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
       )
 
       change_wb <- openxlsx::createWorkbook(title = paste(year, 'Neighborhood Change Summary File'))
-      colwidths <- c(16,19,10,10,13,16,16,16,16,16,16,16,16,16,16,16,16,16,16)
+      colwidths <- rep(20, change_ncols)
 
       hs <- openxlsx::createStyle(textDecoration = "BOLD", fontColour = "#FFFFFF", fontSize=12,
                                   fgFill = "#969696")
@@ -314,13 +317,10 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
         else openxlsx::setColWidths(change_wb, sheet = i, cols = 1:(change_ncols-1), widths = colwidths[-county_col])
       }
 
+      # write change summary files
       openxlsx::saveWorkbook(change_wb,
                              paste0('output/',year, '/final_change_', year, '_public.xlsx'),
                              overwrite = TRUE)
-
-
-
-      # write change shapefile
       change_shp_public <- final %>% filter(region != 'Rural Areas') %>%
         select(change_columns, -region)
       geo_tract <- geo %>% filter(is.na(fips_bg)) %>% select(-fips_bg)

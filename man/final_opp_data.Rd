@@ -54,6 +54,8 @@ Final 2024 Fair Housing Map data dictionary for descriptions of all variables in
   \item lq_hispanic: Location quotient of Hispanic population relative to the county.
   \item oppcat: Opportunity designation.
   \item pov_seg_cat: High Poverty and Segregated designation.  Defined as least 30 percent of the population falling under the federal poverty line and Location Quotient of higher than 1.25 for Black, Hispanic, Asian, or all people of color in comparison to the county.
+  \item baseline_raceinc0021: Binary flag if tract was a LMI and BIPOC neighborhood in 2000
+  \item baseline_race1321: Binary flag if tract was a BIPOC neighborhood in 2013
   \item nbrhood_chng: Binary flag if a tract meets the definition of either long-term (2000-2021) or recent neighborhood change (2013-2021).
   \item trct_raceeth_chng0021: Percentage point change in tract's non-Hispanic white population between 2000 and 2021.
   \item trct_raceeth_chng1321: Percentage point change in tract's non-Hispanic white population between 2013 and 2021.
