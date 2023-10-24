@@ -44,6 +44,9 @@ if(year >= 2024){
   # neighborhood change
   assign("nc_scores", c(2024, "neighborhood_change_layer_2024.csv"), parent.frame())
 
+  # supplementary data
+  assign("lihtc", c(2023, "projects.xlsx"), parent.frame())
+
 }
 }
 
