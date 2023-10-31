@@ -4,7 +4,12 @@
 \alias{xwalk_ces}
 \title{Create site-based environmental hazards variable}
 \usage{
-xwalk_ces(year = current_year, write = FALSE, read = !write)
+xwalk_ces(
+  year = current_year,
+  write = FALSE,
+  read = !write,
+  testing_handle = FALSE
+)
 }
 \arguments{
 \item{year}{designates the appropriate filepaths}

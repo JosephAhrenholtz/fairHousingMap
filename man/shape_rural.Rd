@@ -9,7 +9,7 @@ USDA areas ineligible for rural development housing programs: https://www.sc.ego
 Changes in 2019 detailed: https://www.rd.usda.gov/files/CA-SFH-NoticeRuralAreaReview-Final-4.16.18.pdf
 }
 \usage{
-shape_rural(year = current_year, write = FALSE)
+shape_rural(year = current_year, write = FALSE, testing_handle = FALSE)
 }
 \arguments{
 \item{year}{designates the map year's filepaths}

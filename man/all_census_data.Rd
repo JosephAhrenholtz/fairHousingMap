@@ -20,7 +20,12 @@ all_census_data(
 
 read_census_data(year = current_year, geo = "tract")
 
-read_acs_data(year = current_year, geo = "tract")
+read_acs_data(
+  year = current_year,
+  geo = "tract",
+  testing_handle = FALSE,
+  test_name = ""
+)
 }
 \arguments{
 \item{year}{designates the map year's filepaths}

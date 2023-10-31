@@ -16,9 +16,9 @@
 #read_educ_pov
 testthat::test_that("Scores with density, military, or prisoner flags are successfully invalidated",{
   setwd(here::here())
-  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+  final_opp <- final_opp(write=FALSE,reduced=FALSE)
   flagged_rows <- final_opp[which(final_opp$prison_flag == 1 | final_opp$military_flag == 1 | final_opp$density_flag == 1),]
-  testthat::expect_true(sum(is.na(final_opp$oppscore_zero==TRUE))>dim(flagged_rows)[1])
+  testthat::expect_true(sum(is.na(final_opp$oppscore==TRUE))>dim(flagged_rows)[1])
 })
 
 testthat::test_that("Data is for the correct year",{
@@ -43,14 +43,14 @@ testthat::test_that("Data is for the correct year",{
 
 testthat::test_that("Any tract/bg with 2+ missing indicators should not have a resource designation",{
   setwd(here::here())
-  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+  final_opp <- final_opp(write=FALSE,reduced=FALSE)
   final_opp$na_count <- rowSums(is.na(select(final_opp,pct_above_200_pov_score:pct_not_frpm_score)))
   testthat::expect_true(unique(is.na(final_opp$oppscore[rownames(final_opp[final_opp$na_count>2,])]))) #rows with < 2 indicators have NA for oppscore
 })
 
 testthat::test_that("Ensure score’s align with resource designations",{
   setwd(here::here())
-  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+  final_opp <- final_opp(write=FALSE,reduced=FALSE)
   testthat::expect_true(all(final_opp[final_opp$oppscore>=8,c("oppcat")]=="Highest Resource",na.rm=TRUE))
   testthat::expect_true(all(final_opp[(final_opp$oppscore>=6 & final_opp$oppscore<8),c("oppcat")]=="High Resource",na.rm=TRUE))
   testthat::expect_true(all(final_opp[(final_opp$oppscore>=4 & final_opp$oppscore<6),c("oppcat")]=="Moderate Resource",na.rm=TRUE))
@@ -59,7 +59,7 @@ testthat::test_that("Ensure score’s align with resource designations",{
 
 testthat::test_that("Ensure all neighborhood change indicators brought in using read_neighborhood_change() are null in rural areas",{
   setwd(here::here())
-  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+  final_opp <- final_opp(write=FALSE,reduced=FALSE)
   rural_obs <- dim(final_opp[final_opp$region=="Rural Areas",])[1]
   for(var_name in c("baseline_raceinc0021", "baseline_race1321", "part1", "part2", "nbrhood_chng", "trct_raceeth_chng0021",
                     "trct_raceeth_chng1321", "trct_inc_chng0021", "trct_inc_chng1321", "halfmile_buffer", "raceeth_half0021",
@@ -72,7 +72,7 @@ testthat::test_that("Ensure all neighborhood change indicators brought in using 
 
 testthat::test_that("Ensure minimum of two observations per indicator to calculate a median for a region/rural county (regionid)",{
   setwd(here::here())
-  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+  final_opp <- final_opp(write=FALSE,reduced=FALSE)
 
   #generate handle for regionid-wise row count
   region_wise_counts <- final_opp %>%
@@ -92,7 +92,7 @@ testthat::test_that("Ensure minimum of two observations per indicator to calcula
 #this test also ensures the minimum two observation rule per indicator but the former is closer to the language/angle in the documentation (testing count of indicators instead of geographies)
 testthat::test_that("Ensure there’s at least two geographies within a region/rural county to assign a resource designation",{
   setwd(here::here())
-  final_opp <- final_opp(write=TRUE,reduced=FALSE)
+  final_opp <- final_opp(write=FALSE,reduced=FALSE)
 
   #create columns containing count of regionid-wise null values
   region_counts <- final_opp %>%

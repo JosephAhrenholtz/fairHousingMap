@@ -15,8 +15,9 @@
 #' @examples
 #' school_distances(year = 2024, geo = 'tract', write = TRUE, read = FALSE) # writes a new file to the intermediate directory
 #'
-#' @import dplyr testit
+#' @import dplyr
 #' @importFrom geosphere distGeo
+#' @importFrom testit assert
 #'
 #' @export
 school_distances <- function(year = current_year, geo = 'tract', write = FALSE, read = !write, testing_handle=FALSE){

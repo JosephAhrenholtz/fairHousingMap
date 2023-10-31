@@ -102,13 +102,11 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
 
   # invalidate scores with density, military, or prisoner flags
-  final$oppscore_zero[which(final$prison_flag == 1 | final$military_flag == 1 |
+  final$oppscore[which(final$prison_flag == 1 | final$military_flag == 1 |
                          final$density_flag == 1)] <- NA
   final$pov_seg_flag[which(final$prison_flag == 1 | final$military_flag == 1 |
                              final$density_flag == 1)] <- NA
 
-  # create positive orientation for communication purposes
-  final <- final %>% mutate(oppscore = oppscore_zero + 9)
 
 
   # create positive orientation for communication purposes

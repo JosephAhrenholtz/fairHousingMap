@@ -10,7 +10,12 @@ shape_CA_tract created using tigris package: /data-raw/R/generate_census_shapes.
 list of TCAC rural counties: https://www.treasurer.ca.gov/ctcac/Cover-memo.pdf
 }
 \usage{
-create_regions(year = current_year, write = FALSE, read = !write)
+create_regions(
+  year = current_year,
+  write = FALSE,
+  read = !write,
+  testing_handle = FALSE
+)
 
 rural_overlay(
   block_points,

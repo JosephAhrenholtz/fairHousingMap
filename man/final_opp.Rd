@@ -8,7 +8,12 @@
 \usage{
 final_opp(year = current_year, write = FALSE, reduced = TRUE, as_geo = FALSE)
 
-final_raw(year = current_year, geo = "tract", write = FALSE)
+final_raw(
+  year = current_year,
+  geo = "tract",
+  write = FALSE,
+  testing_handle = FALSE
+)
 
 final_prepare(year = current_year, geo = "tract", .data = NULL)
 }
@@ -28,7 +33,7 @@ a data frame
 }
 \description{
 `final_raw` loads and combines all intermediate files with economic, education, and environmental indicators.
-`final_prepare`creates the high poverty and segregated designation and flags unreliable data.
+`final_prepare` creates the high poverty and segregated designation and flags unreliable data.
 `final_opp` creates the final opportunity scores and designations.  `final_raw` and `final_prepare` are both
 inputs into `final_opp`.  Only `final_opp` is necessary to run for generating new data.
 }
