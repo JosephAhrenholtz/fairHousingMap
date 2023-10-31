@@ -15,12 +15,11 @@
 #' @examples
 #' school_distances(year = 2024, geo = 'tract', write = TRUE, read = FALSE) # writes a new file to the intermediate directory
 #'
-#' @import dplyr
+#' @import dplyr testit
 #' @importFrom geosphere distGeo
 #'
 #' @export
-school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
-  read = !write){
+school_distances <- function(year = current_year, geo = 'tract', write = FALSE, read = !write, testing_handle=FALSE){
   filename = paste0("data/intermediate/", year,'/education_indicators_', geo, '.csv.gz')
   if(read == TRUE){
     distance_indicators <- readr::read_csv(filename, col_types = readr::cols())
@@ -40,6 +39,8 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
     }
   filepaths(year = year)
 
+
+
   # Load elementary school data, then separate scores and frpm
   elem_schls <- read_educ_pov(year = year)
   #limit test scores to schools with observed 4th-grade test scores.
@@ -47,7 +48,6 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
     read_prof, math_prof) %>% na.omit()
   frpm <- dplyr::select(elem_schls, CDSCode, enrollment, pct_frpm, pct_freemeals,
     lat, lon)
-
 
   school_list <- vector('list', nrow(centroids))
 
@@ -81,6 +81,7 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
     near_elem <- dplyr::arrange(near_elem, distance_elem)
     near_frpm <- dplyr::arrange(near_frpm, distance_frpm)
     near_high <- dplyr::arrange(near_high, distance_high)
+
     #reducing to top 3 results
     nearest_elem <- near_elem[1:3,]
     nearest_frpm <- near_frpm[1:3,]
@@ -91,6 +92,15 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
       by = c('CDSCode', 'enrollment')) %>%
       dplyr::full_join(nearest_high, by = 'CDSCode', suffix = c('','_hs'))
 
+    if(testing_handle==TRUE){
+      #there should be three schools under each category (elem, frpm, high)
+      testit::assert("three nearest elementary schools",sum(!is.na(nearest$distance_elem))==3)
+      testit::assert("three nearest high schools",sum(!is.na(nearest$distance_high))==3)
+      testit::assert("three nearest free or reduced-price meal schools",sum(!is.na(nearest$distance_frpm))==3)
+      testit::assert("all schools are unique",length(unique(nearest$CDSCode))==dim(nearest)[1])
+    }
+
+
     # adding tract/block group
     if(geo == 'tract') nearest$fips <- row$fips
     else nearest$fips_bg <- row$fips_bg
@@ -98,7 +108,6 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE,
     #add school info using the indexes created above
     school_list[[i]] <- dplyr::select(nearest, -dplyr::matches('l[oa][nt]'))
   }
-
 
 distance_indicators_Sch <- dplyr::bind_rows(school_list)
 #group by either geographic boundary and summarize school results
@@ -112,7 +121,7 @@ distance_indicators <- dplyr::summarize(distance_indicators_Sch,
                                         read_prof = weighted.mean(read_prof,enrollment, na.rm = T),
                                         math_prof = weighted.mean(math_prof,enrollment, na.rm = T),
                                         grad_rate = weighted.mean(grad_rate,enrollment_hs, na.rm = T),
-                                        distance_elem_avg = meanna(distance_elem)/1609.34,
+                                        distance_elem_avg = mean(distance_elem, na.rm=TRUE)/1609.34,
                                         distance_elem_closest = min(distance_elem, na.rm = T)/1609.34,
                                         distance_elem_farthest = max(distance_elem, na.rm = T)/1609.34) # include across() as a summarize argument to keep school info
 
@@ -122,7 +131,7 @@ distance_indicators$pct_not_frpm <- 1 - distance_indicators$pct_frpm
 # distance_indicators <- dplyr::left_join(distance_indicators, graduation_rates(), by = 'fips')
 
 if(write == TRUE){
-  readr::write_csv(distance_indicators, filename)
+    readr::write_csv(distance_indicators, filename)
 }
 else distance_indicators
 }

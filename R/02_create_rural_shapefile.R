@@ -23,28 +23,33 @@
 #'
 
 #' @export
-shape_rural <- function(year = current_year, write = FALSE){
+shape_rural <- function(year = current_year, write = FALSE, testing_handle = FALSE){
   filepaths(year)
-shape_USDA_excluded <- sf::st_read(USDA_excluded, quiet = TRUE)
-shape_USDA_excluded <- subset(shape_USDA_excluded, STATENAME == 'California')
-# resolve overlapping boundaries and shift to the specified projection
-shape_USDA_excluded <- sf::st_buffer(shape_USDA_excluded, dist = 0.1)
-shape_USDA_excluded <- sf::st_transform(shape_USDA_excluded, crs = 4326)
-# simplify into one polygon
-shape_USDA_excluded <- sf::st_geometry(shape_USDA_excluded) %>%
-  sf::st_union()
-# subtract ineligible areas from shape_CA for eligible areas, throws an
-#   unnecessary warning to ensure both shapes are the same CRS
-shape_USDA <- suppressWarnings(suppressMessages(
-  sf::st_difference(shape_CA_state, shape_USDA_excluded) ))
+  shape_USDA_excluded <- sf::st_read(USDA_excluded, quiet = TRUE)
+  shape_USDA_excluded <- subset(shape_USDA_excluded, STATENAME == 'California')
+  # resolve overlapping boundaries and shift to the specified projection
+  shape_USDA_excluded <- sf::st_buffer(shape_USDA_excluded, dist = 0.1)
+  shape_USDA_excluded <- sf::st_transform(shape_USDA_excluded, crs = 4326)
+  # simplify into one polygon
+  shape_USDA_excluded <- sf::st_geometry(shape_USDA_excluded) %>%
+    sf::st_union()
 
-if(write == TRUE){
-#create shapefile directory; must be deleted if it exists
-unlink(paste0("data/intermediate/",year, "/rural_shapefile"), recursive = TRUE)
-sf::st_write(shape_USDA, dsn = paste0("data/intermediate/",year, "/rural_shapefile"), layer =
-                  'rural_shapefile', driver = 'ESRI Shapefile')
-}
-else shape_USDA
+  if(testing_handle==TRUE){
+    return(shape_USDA_excluded)
+  }
+
+  # subtract ineligible areas from shape_CA for eligible areas, throws an
+  #   unnecessary warning to ensure both shapes are the same CRS
+  shape_USDA <- suppressWarnings(suppressMessages(
+    sf::st_difference(shape_CA_state, shape_USDA_excluded) ))
+
+  if(write == TRUE){
+  #create shapefile directory; must be deleted if it exists
+  unlink(paste0("data/intermediate/",year, "/rural_shapefile"), recursive = TRUE)
+  sf::st_write(shape_USDA, dsn = paste0("data/intermediate/",year, "/rural_shapefile"), layer =
+                    'rural_shapefile', driver = 'ESRI Shapefile')
+  }
+  else shape_USDA
 }
 
 

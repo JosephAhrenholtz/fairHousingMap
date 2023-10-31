@@ -25,7 +25,7 @@
 #' @import dplyr
 #'
 #' @export
-xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
+xwalk_ces <- function(year = current_year, write = FALSE, read = !write, testing_handle=FALSE) {
   filepaths(year = year)
 
 
@@ -37,7 +37,7 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
 
   # load last year's data and select only relevant vars
   env <- final_2023 %>% select(fips, fips_bg, region, county_name,
-                                  cleanup_sites, hazard_waste, groundwater, solid_waste)
+                               cleanup_sites, hazard_waste, groundwater, solid_waste)
 
   # compute statewide ranking
   env_state <- env %>%
@@ -63,8 +63,10 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write) {
     mutate(env_site_mean = rowMeans(select(., cleanup_sites:solid_waste), na.rm = TRUE),
            env_site_pctl = percent_rank(env_site_mean))
 
-
-
+  
+  if(testing_handle==TRUE){
+    return(env)
+  }
 
 
   # identify bottom 95% of site-based values by region if n >= 20, by state if n < 20

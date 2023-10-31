@@ -34,8 +34,7 @@
 
 
 #' @export
-create_regions <- function(year = current_year, write = FALSE,
-  read = !write){
+create_regions <- function(year = current_year, write = FALSE,read = !write, testing_handle=FALSE){
   if(read){
     regions <- readr::read_csv(paste0("data/intermediate/", year, "/tract_county_region.csv"),
     col_types = readr::cols(), guess_max = 10000)
@@ -43,42 +42,47 @@ create_regions <- function(year = current_year, write = FALSE,
     return(regions)
   }
   filepaths(year = year)
-#read in tracts and keep county names
-counties <- shape_CA_tract %>% st_drop_geometry()
-counties$county_name <- paste(counties$county_name, 'CA')
-#region to county crosswalk; merge with tracts
-region_xwalk <- read_zip(county_region_xwalk, year, col_types = readr::cols())
-region_xwalk$county <- paste(region_xwalk$county, 'CA')
-counties <- dplyr::left_join(counties, region_xwalk, by = c('county_name' = 'county'))
+  #read in tracts and keep county names
+  counties <- shape_CA_tract %>% st_drop_geometry()
+  counties$county_name <- paste(counties$county_name, 'CA')
+  #region to county crosswalk; merge with tracts
+  region_xwalk <- read_zip(county_region_xwalk, year, col_types = readr::cols())
+  region_xwalk$county <- paste(region_xwalk$county, 'CA')
+  counties <- dplyr::left_join(counties, region_xwalk, by = c('county_name' = 'county'))
 
-#read in USDA rural areas
-shape_rural <- shape_rural(year = year)
+  #read in USDA rural areas
+  shape_rural <- shape_rural(year = year)
 
-shape_block_centers <- read_block_centers(as_shape = TRUE)
+  shape_block_centers <- read_block_centers(as_shape = TRUE)
 
-#create rural overlay in a separate step; saves time if testing:
-rural_overlay <- rural_overlay(shape_block_centers, shape_rural,
-  create_overlay = TRUE, collapse = T)
-rural_tract_designation <- rural_overlay(shape_block_centers, create_overlay = rural_overlay)
+  #create rural overlay in a separate step; saves time if testing:
+  rural_overlay <- rural_overlay(shape_block_centers, shape_rural,
+    create_overlay = TRUE, collapse = T)
+  rural_tract_designation <- rural_overlay(shape_block_centers, create_overlay = rural_overlay)
 
-region_tract_designation <- dplyr::full_join(counties, rural_tract_designation, by =
-                                                c('fips', 'county_name' = 'cntyname'))
-region_tract_designation$region[which(region_tract_designation$rural_flag == 1)] <-  'Rural Areas'
+  region_tract_designation <- dplyr::full_join(counties, rural_tract_designation, by =
+                                                  c('fips', 'county_name' = 'cntyname'))
+  region_tract_designation$region[which(region_tract_designation$rural_flag == 1)] <-  'Rural Areas'
 
-# manually add counties designated as rural in methodology
-rural_counties <- c('Alpine', 'Amador', 'Calaveras', 'Colusa', 'Del Norte',
-  'Glenn', 'Humboldt', 'Inyo', 'Lake', 'Lassen', 'Mariposa', 'Mendocino',
-  'Modoc', 'Mono', 'Nevada', 'Plumas', 'Sierra', 'Siskiyou', 'Tehama', 'Trinity',
-  'Tuolumne', 'Butte', 'Shasta', 'Sutter', 'Yuba')
-rural_counties <- paste(rural_counties, 'CA')
-region_tract_designation$region[which(
-  region_tract_designation$county_name %in% rural_counties)] <- "Rural Areas"
-region_tract_designation$rural_flag[which(region_tract_designation$region == 'Rural Areas')] <- 1
+  # manually add counties designated as rural in methodology
+  rural_counties <- c('Alpine', 'Amador', 'Calaveras', 'Colusa', 'Del Norte',
+    'Glenn', 'Humboldt', 'Inyo', 'Lake', 'Lassen', 'Mariposa', 'Mendocino',
+    'Modoc', 'Mono', 'Nevada', 'Plumas', 'Sierra', 'Siskiyou', 'Tehama', 'Trinity',
+    'Tuolumne', 'Butte', 'Shasta', 'Sutter', 'Yuba')
+  rural_counties <- paste(rural_counties, 'CA')
 
-if(write == TRUE){
-readr::write_csv(region_tract_designation, paste0("data/intermediate/", year, "/tract_county_region.csv"))
-}
-else region_tract_designation
+  if(testing_handle==TRUE){
+    return(rural_counties)
+  }
+
+  region_tract_designation$region[which(
+    region_tract_designation$county_name %in% rural_counties)] <- "Rural Areas"
+  region_tract_designation$rural_flag[which(region_tract_designation$region == 'Rural Areas')] <- 1
+
+  if(write == TRUE){
+  readr::write_csv(region_tract_designation, paste0("data/intermediate/", year, "/tract_county_region.csv"))
+  }
+  else region_tract_designation
 }
 
 

@@ -3,7 +3,7 @@
 #'
 #' @description
 #' `final_raw` loads and combines all intermediate files with economic, education, and environmental indicators.
-#' `final_prepare`creates the high poverty and segregated designation and flags unreliable data.
+#' `final_prepare` creates the high poverty and segregated designation and flags unreliable data.
 #' `final_opp` creates the final opportunity scores and designations.  `final_raw` and `final_prepare` are both
 #' inputs into `final_opp`.  Only `final_opp` is necessary to run for generating new data.
 #'
@@ -102,10 +102,13 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
 
   # invalidate scores with density, military, or prisoner flags
-  final$oppscore[which(final$prison_flag == 1 | final$military_flag == 1 |
+  final$oppscore_zero[which(final$prison_flag == 1 | final$military_flag == 1 |
                          final$density_flag == 1)] <- NA
   final$pov_seg_flag[which(final$prison_flag == 1 | final$military_flag == 1 |
                              final$density_flag == 1)] <- NA
+
+  # create positive orientation for communication purposes
+  final <- final %>% mutate(oppscore = oppscore_zero + 9)
 
 
   # create positive orientation for communication purposes
@@ -147,7 +150,6 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
   # join neighborhood change of non-rural tracts
   change <- read_neighborhood_change(year = year)
   final <- final %>% left_join(change, by = 'fips')
-
 
   # return reduced dataframe of map vars by default
   if(reduced == FALSE){
@@ -219,7 +221,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 # everything below this line is an input to the final_opp function
 #' @export
 #' @rdname final_opp
-final_raw <- function(year = current_year, geo = 'tract', write = FALSE){
+final_raw <- function(year = current_year, geo = 'tract', write = FALSE, testing_handle=FALSE){
 
   # read data from previously generated files
   education_indicators <- school_distances(year = year, geo = geo)
@@ -234,9 +236,9 @@ final_raw <- function(year = current_year, geo = 'tract', write = FALSE){
 
   })
 
-  #sanity check that all acs variables are of the correct year
-  if(sum(is.na((grepl(year-3, names(rawdata))) == 0))) stop("ACS variables are incorrect")
-
+  if(testing_handle==TRUE){
+    return(rawdata) #without removing year suffixes
+  }
 
   #remove year suffixes from ACS variable names
   acs_year <- year-3
