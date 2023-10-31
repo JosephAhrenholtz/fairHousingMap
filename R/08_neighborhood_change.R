@@ -29,6 +29,7 @@ read_neighborhood_change <- function(year = current_year){
                   rural_flag,
                   baseline_raceinc0021,
                   baseline_race1321,
+                  baseline_income1321,
                   part1,
                   part2,
                   nbrhood_chng,

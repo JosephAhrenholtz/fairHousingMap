@@ -6,4 +6,6 @@ data-raw/*
 data/intermediate/
 analysis/
 output/
+R/neighborhood_change/Data/*
+R/neighborhood_change/Results/*
 .tmp.*

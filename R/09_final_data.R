@@ -58,30 +58,47 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
     ungroup()
 
 
-  # remove scores where less than 2 obs per indicator or less than 2 geos per region
+  # remove scores with less than 2 obs
   final <- final %>%
-    group_by(regionid,county_name) %>%
-    mutate_at(vars(pct_above_200_pov_score:pct_not_frpm_score), function(x) case_when(sum(!is.na(x)) <= 1 ~ NA_real_, TRUE ~ x)) %>%
+    group_by(regionid) %>%
+    mutate_at(vars(pct_above_200_pov_score:pct_not_frpm_score), function(x) case_when(sum(!is.na(x)) < 2 ~ NA_real_, TRUE ~ x)) %>%
     ungroup()
 
-  # remove medians where less than 2 obs per indicator or less than 2 geos per region
+  # invalidate medians with less than 2 obs
   final <- final %>%
-    group_by(regionid,county_name) %>%
-    mutate_at(vars(pct_above_200_pov_median:pct_not_frpm_median), function(x) case_when(sum(!is.na(x)) <= 1 ~ NA_real_, TRUE ~ x)) %>%
+    group_by(regionid) %>%
+    mutate_at(vars(pct_above_200_pov:pct_not_frpm), list(valid = function(x) sum(!is.na(x)))) %>%
     ungroup()
+
+  final$pct_above_200_pov_median[which(final$pct_above_200_pov_valid < 2)] <- NA
+  final$home_value_median[which(final$home_value_valid < 2)] <- NA
+  final$pct_bachelors_plus_median[which(final$pct_bachelors_plus_valid < 2)] <- NA
+  final$pct_employed_median[which(final$pct_employed_valid < 2)] <- NA
+  final$math_prof_median[which(final$math_prof_valid < 2)] <- NA
+  final$read_prof_median[which(final$read_prof_valid < 2)] <- NA
+  final$grad_rate_median[which(final$grad_rate_valid < 2)] <- NA
+  final$pct_not_frpm_median[which(final$pct_not_frpm_valid < 2)] <- NA
+
 
   # calculate total non-null values for each geography
   final <- final %>%
-    mutate(total = rowSums(
+    mutate(total_valid = rowSums(
       transmute_at(., vars(pct_above_200_pov_score:pct_not_frpm_score, env_site_score),
                    function(x) ifelse(!is.na(x), 1, 0))))
 
 
+  # calculate positively oriented score
+  final <- final %>%
+    mutate(oppscore = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE),
+           # invalidate scores with more than 2 missing values
+           oppscore = ifelse(total_valid >= 7, oppscore, NA))
+
+
 
   # calculate score with a baseline of 0 to account for null values (rework this so that null values are accounted for in the positive oriented version)
-  final <- final %>%
-    mutate(oppscore_zero = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE) - total,
-           oppscore_zero = ifelse(total >= 6, oppscore_zero, NA))
+  # final <- final %>%
+  #   mutate(oppscore_zero = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE) - total,
+  #          oppscore_zero = ifelse(total >= 6, oppscore_zero, NA))
 
 
   # invalidate scores with density, military, or prisoner flags
@@ -92,6 +109,10 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
   # create positive orientation for communication purposes
   final <- final %>% mutate(oppscore = oppscore_zero + 9)
+
+
+  # create positive orientation for communication purposes
+  #final <- final %>% mutate(oppscore = oppscore_zero + 9)
 
 
   # create opportunity categories
@@ -123,7 +144,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
   # add poverty and env hazard threshold for interface charts
   final <- final %>%
-    mutate(env_site_thresh = .95, high_pov_thresh = .3, seg_thresh = 1.25)
+    mutate(high_pov_thresh = .3, seg_thresh = 1.25)
 
 
   # join neighborhood change of non-rural tracts
@@ -142,14 +163,17 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
         total_pop,
         pop_density,
         # opp indicators
-        pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), env_site_thresh,
+        pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'),
         # pov and seg indicators
         pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
+        pct_asian, pct_black, pct_hispanic, pct_poc,
+        asian_seg_thresh, black_seg_thresh, hispanic_seg_thresh, poc_seg_thresh,
         # designations
         oppcat, pov_seg_flag,
         # neighborhood change
         baseline_raceinc0021,
         baseline_race1321,
+        baseline_income1321,
         part1,
         part2,
         nbrhood_chng,
@@ -175,7 +199,11 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
       rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
       final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
 
-      sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
+      if(write == TRUE){
+        sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
+      }
+
+
       return(final_geo)
     }
   }
@@ -264,7 +292,14 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
     final_prep$hispanic_conc[which(final_prep$lq_hispanic > 1.25)] <- 1
     final_prep$poc_conc[which(final_prep$lq_poc > 1.25)] <- 1
 
-
+    # create county specific threshold for share of each group that equates to 1.25 LQ
+    final_prep <- final_prep %>%
+      group_by(county_name) %>%
+      mutate(asian_seg_thresh = 1.25*pct_asian_cty,
+             black_seg_thresh = 1.25*pct_black_cty,
+             hispanic_seg_thresh = 1.25*pct_hispanic_cty,
+             poc_seg_thresh = 1.25*pct_poc_cty) %>%
+      ungroup()
 
   # begin applying flags
   # apply coefficient of variation test for ACS variables and suppress unreliable data
@@ -286,7 +321,7 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
                              final_prep$cvemp > 30)] <- 1
   final_prep$homeflag[which(final_prep$home_value == 0 | is.na(final_prep$home_value) |
                               final_prep$cvhomevalue > 30)] <- 1
-  final_prep$conpovcv[which(final_prep$pct_below_pov == 0 | is.na(final_prep$pct_below_pov) |
+  final_prep$conpovcv[which(is.na(final_prep$pct_below_pov) |
                               final_prep$cvpov > 30)] <- 1
 
 
@@ -333,14 +368,14 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
     final_prep$pct_black[which(final_prep$black_cv_flag == 1)] <- NA
     final_prep$pct_hispanic[which(final_prep$hispanic_cv_flag == 1)] <- NA
     final_prep$pct_white[which(final_prep$white_cv_flag == 1)] <- NA
-    # use white cv to invalidate poc measure bc calculated as 1 - pct_white
-    final_prep$pct_poc[which(final_prep$white_cv_flag == 1)] <- NA
+    # use white cv to invalidate poc measure bc calculated as 1 - pct_white # deciding what to do here.  Alt: sum Asian, Black, Hisp?
+    #final_prep$pct_poc[which(final_prep$white_cv_flag == 1)] <- NA
 
     # invalidate concentrated race flags with high MOEs
     final_prep$asian_conc[which(final_prep$asian_cv_flag == 1)] <- NA
     final_prep$black_conc[which(final_prep$black_cv_flag == 1)] <- NA
     final_prep$hispanic_conc[which(final_prep$hispanic_cv_flag == 1)] <- NA
-    final_prep$poc_conc[which(final_prep$white_cv_flag == 1)] <- NA
+    #final_prep$poc_conc[which(final_prep$white_cv_flag == 1)] <- NA
 
     # create racial seg flag
     final_prep <- dplyr::mutate(final_prep, racial_seg = 0)
@@ -352,6 +387,7 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
     final_prep$conpovflag <- ifelse(final_prep$pct_below_pov >= 0.3, 1, 0)
     final_prep$pov_seg_flag <- ifelse((final_prep$racial_seg == 1 &
                                     final_prep$conpovflag == 1), 1, 0)
+
 
 
 

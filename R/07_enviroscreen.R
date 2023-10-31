@@ -63,7 +63,7 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write, testing
     mutate(env_site_mean = rowMeans(select(., cleanup_sites:solid_waste), na.rm = TRUE),
            env_site_pctl = percent_rank(env_site_mean))
 
-
+  
   if(testing_handle==TRUE){
     return(env)
   }
