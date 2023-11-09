@@ -187,6 +187,11 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
         rent_quarter1321,
         trct_pctchng_medrent1321)
 
+    # limit digits to 4 to minimize file size
+    final <- final %>% mutate_if(is.numeric,
+                             round,
+                             digits = 4)
+
     # option to write geojson
     if(as_geo == TRUE){
       #final <- final %>% select(-ends_with('_score'))
