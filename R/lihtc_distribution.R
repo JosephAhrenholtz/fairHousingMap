@@ -2,12 +2,12 @@
 #'
 #' @source TCAC Projects: https://www.treasurer.ca.gov/ctcac/projects.asp
 #'
-#' @import ggmap
+#' @import dplyr tidyr stringr tidygeocoder tigris
 
 
-# load LIHTC data, format tract numbers, filter for 9% new construction
-#   in prelim reservation phase or placed in service
-get_lihtc <- function(year = current_year){
+
+# STEP 1: LOAD, REDUCE, FORMAT FIPS
+get_devels <- function(year = current_year){
   filepaths(year = year)
 
   tcac_devels <- read_zip(lihtc, year = year, type = 'excel', sheet = "California Mapped Projects")
@@ -17,61 +17,139 @@ get_lihtc <- function(year = current_year){
     rename(appid = `Application.Number`, app_stage = `Application.Stage`,
            PISdate = `Placed.in.Service.(PIS).Date`,
            address = `Project.Address`, housing_type = `Housing.Type`,
-           lowinc_units = `Low.Income.Units`, tract = `Census.Tract`,
+           lowinc_units = `Low.Income.Units`,
            county_name = `Project.County`, construct_type = `Construction.Type`,
            zipcode = `Project.Zip.Code`, credit_type = `Type.of.tax.credit.funding`,
-           fedaward = `Annual.Federal.Award`, state_award =  `Total.State.Award`,) %>%
+           ) %>%
     # create application year column from appid
     mutate(app_year = substr(appid, 4,7)) %>%
-    select(tract, county_name, app_year, app_stage, PISdate, address, zipcode, appid,
-           housing_type, construct_type, credit_type, lowinc_units, fedaward, state_award)
+    select(appid, app_year, app_stage, PISdate, address, zipcode, county_name,
+           housing_type, construct_type, credit_type, lowinc_units)
 
 
-  # format tract numbers
+  # ensure target variables are formatted consistently (could be written more elegantly)
+  tcac_devels$housing_type[which(tcac_devels$housing_type == 'Large family')] <- 'Large Family'
+  tcac_devels$housing_type[which(tcac_devels$construct_type == 'New Construction ')] <- 'New Construction'
+  tcac_devels$credit_type <- str_replace_all(tcac_devels$credit_type, c("9% ARRA" = "9 %", "0.09" = "9 %"))
+  tcac_devels$credit_type <- str_replace_all(tcac_devels$credit_type, c("4% ARRA" = "4 %", "0.04" = "4 %", "4%" = "4 %"))
+
+  # filter to exclusively new construction, family-serving developments after 2014 and ensure there is an associated credit type
   tcac_devels <- tcac_devels %>%
-    # separate projects with multiple developments
-    tidyr::separate_rows(tract, sep = ',') %>%
-    # separate digits before and after decimal
-    tidyr::separate(tract, c('tract_prefix', 'tract_suffix'), sep = '\\.',
-             fill = 'right') %>%
-    # add trailing zeroes to tracts
-    mutate(tract_prefix = str_pad(tract_prefix, 4, 'left', '0'),
-           tract_suffix = str_pad(tract_suffix, 2, 'right', '0'))
-
-  #add zeroes for missing tract suffixes
-  tcac_devels$tract_suffix[which(is.na(tcac_devels$tract_suffix))] <- '00'
-  #remove uncatagorizable tracts
-  tcac_devels <- filter(tcac_devels, nchar(tract_prefix) < 5) %>%
-    # merge tract numbers together
-    unite('fips', tract_prefix, tract_suffix, sep = '')
+    filter(housing_type == 'Large Family' & construct_type == 'New Construction' & as.numeric(app_year) >= 2014 & !is.na(credit_type))
 
 
-  # merge in county codes and to make the full tract number
-  county_codes <- all_census_data()[c('county_name', 'countyid')]
-  county_codes <- county_codes[which(duplicated(county_codes$county_name) ==
-                                       F),]
-  # join lihtc to county codes
-  tcac_devels <- inner_join(tcac_devels, county_codes, by='county_name') %>%
-    mutate(fips = paste0(countyid, fips), zipcode =
-             str_sub(zipcode, 1, 5))
-
-  # make fips codes 11 characters long
-  tcac_devels <- tcac_devels %>%
-    mutate(fips = substr(fips, 1 , 11)) %>%
-    mutate(fips = gsub(" ", "0", fips)) %>%
-    # end tract formatting
-    # Note on tract formatting: there's data entry error in the original 'Census Tract' column;
-    # need to implement a system for invalidating/handling erroneous or inconsistent entries
-
-  # start address formatting here
+  # NOTE: WE MAY NEED ADDITIONAL FILTER ON APPLICATION STAGE BUT NEED TO CONFIRM
 
   return(tcac_devels)
 
 }
 
 
+# STEP 2: GEOCODE
+geocode_devels <- function(){
+  # get devels
+  devels <- get_devels()
+
+  # taking sample for small geocoding request
+  devels <- devels[sample(nrow(devels), 10),]
+
+  devels <- devels %>% tidygeocoder::geocode(address = address, method = 'arcgis')
+
+  # add step to filter by performance
+
+  # writing this function to avoid successive geocoding requests
+  write_csv(devels, paste0('data/intermediate/', year, '/geocoded_devels.csv'))
+
+}
 
 
+
+# STEP 3: JOIN TO OPPORTUNITY
+join_opp <- function(year = current_year){
+
+
+  # load devels and make sf
+  devels <- sf::st_read(paste0("data/intermediate/", year, "/geocoded_devels.csv"))
+  devels <- devels %>%
+    st_as_sf(coords = c("long","lat")) %>%
+    st_sf(crs = 4326)
+
+  # load opp and reduce to necessary columns
+  opp <- final_opp(write = F, as_geo = T) %>%
+    select(fips, fips_bg, region, oppcat, pov_seg_flag, nbrhood_chng)
+
+  # spatial join devels to opp cats
+  opped_devels <- opp %>%
+    sf::st_join(devels)
+
+  # return to df
+  opped_devels <- opped_devels %>%
+    st_drop_geometry()
+
+
+  return(opped_devels)
+
+
+}
+
+# STEP 4: JOIN SEG
+# note: seg data is to 2010 boundaries so need to create this seperately
+join_seg <- function(year = current_year){
+  filepaths(year = year)
+
+  # load devels and make sf
+  devels <- sf::st_read(paste0("data/intermediate/", year, "/geocoded_devels.csv"))
+  devels <- devels %>%
+    st_as_sf(coords = c("long","lat")) %>%
+    st_sf(crs = 4326)
+
+  # load seg cat and make spatial
+  segcat <- read_zip(segcat, year = year, type = 'csv')
+  segcat <- segcat %>% select(geoid, segcat) %>% rename('fips' = geoid)
+  tract_2010 <- tracts(state = "CA", year = 2010) %>% select(GEOID10, geometry) %>% rename('fips' = GEOID10)
+  segcat <- segcat %>%
+    left_join(tract_2010, by = 'fips') %>%
+                st_as_sf(crs = 4326)
+
+  # spatial join devels to opp cats
+  segcat_devels <- segcat %>%
+    sf::st_join(devels)
+
+  # return to df
+  segcat_devels <- segcat_devels %>%
+    st_drop_geometry()
+
+  return(segcat_devels)
+
+
+}
+
+
+# STEP 5: CREATE SUMMARY TABLES
+# params need to be re-written to be more clear
+# for now can call:
+#         summarize_lihtc(neighb_type = 'opp', grouping =  oppcat) or
+#         summarize_lihtc(neighb_type = 'seg', grouping =  segcat)
+
+summarize_lihtc <- function(neighb_type = 'opp', grouping =  oppcat){
+
+  if(neighb_type != 'opp'){
+    df <- join_seg()
+    levels <- c('High POC Segregation', 'High White Segregation', 'Low-Medium Segregation', 'Racially Integrated')
+  } else {
+    df <- join_opp()
+    levels <- c('Low Resource', 'Moderate Resource', 'High Resource', 'Highest Resource')
+  }
+
+  tbl <- df %>%
+    group_by({{grouping}}) %>%
+    summarize(developments = n(), lowinc_units = sum(as.numeric(lowinc_units), na.rm = TRUE)) %>%
+    mutate_at(vars(developments, lowinc_units),
+              list(perc = ~round(./sum(.), 3))) %>%
+     arrange(factor({{grouping}}, levels = levels))
+
+  return(tbl)
+}
 
 
 
