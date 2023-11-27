@@ -66,3 +66,45 @@ verify_geo <- function(x){
   if(!x %in% c('tract', 'bg')) stop("geo must be either 'tract' or 'bg' (for block groups)")
 }
 
+# custom plot theme
+plot_theme <- function(base_size = 12, title_size = 12) {
+  theme(
+    text = element_text( color = "black"),
+    plot.title = element_text(size = title_size, colour = "black", face = 'bold'),
+    plot.subtitle = element_text(face="italic"),
+    plot.caption = element_text(hjust=0, colour = '#666666', size = 8),
+    axis.ticks = element_blank(),
+    panel.background = element_blank(),
+    panel.grid.major = element_line("grey80", size = 0.1),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(colour = "black", fill=NA, size=2),
+    strip.background = element_rect(fill = "grey80", color = "white"),
+    strip.text = element_text(size=12),
+    axis.title = element_text(size=12),
+    axis.text = element_text(size=10),
+    plot.background = element_blank(),
+    legend.background = element_blank(),
+    legend.title = element_text(colour = "black", face = "italic"),
+    legend.text = element_text(colour = "black", face = "italic"),
+    strip.text.x = element_text(size = 12)
+  )
+}
+
+# custom map theme
+map_theme <- function(base_size = 12, title_size = 12) {
+  theme(
+    text = element_text( color = "black"),
+    plot.title = element_text(size = title_size,colour = "black", face = 'bold'),
+    plot.subtitle=element_text(face="italic"),
+    plot.caption=element_text(hjust=0),
+    axis.ticks = element_blank(),
+    panel.background = element_blank(),axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(colour = "black", fill=NA, size=2),
+    legend.text = element_text(colour = "black", face = "italic"),
+    strip.text.x = element_text(size = 14))
+}
+
