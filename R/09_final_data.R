@@ -166,8 +166,8 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
         pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
         pct_asian, pct_black, pct_hispanic, pct_poc,
         asian_seg_thresh, black_seg_thresh, hispanic_seg_thresh, poc_seg_thresh,
-        # designations
-        oppcat, pov_seg_flag,
+        # score/designations
+        oppscore, oppcat, pov_seg_flag,
         # neighborhood change
         baseline_raceinc0021,
         baseline_race1321,
@@ -202,7 +202,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
       rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
       final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
 
-      return(final_geo)
+      #return(final_geo)
 
       if(write == TRUE){
         sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
