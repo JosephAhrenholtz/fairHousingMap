@@ -102,7 +102,20 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
   final <- final %>%
     left_join(tribal_overlap(), by = 'fips')
   final$pov_seg_flag[which(final$prison_flag == 1 | final$military_flag == 1 |
-                             final$density_flag == 1) | final$nativeland_flag == 1] <- NA
+                             final$density_flag == 1 | final$nativeland_flag == 1)] <- NA
+
+  # add single exclusion flag
+  final <- final %>%
+    mutate(exclude_flag =
+             case_when(
+               density_flag == 1 ~ 1,
+               prison_flag == 1 ~ 1,
+               military_flag == 1 ~ 1,
+               TRUE ~ 0
+             ))
+
+
+
 
   # create opportunity categories
   final <- final %>%
@@ -127,6 +140,30 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
   change <- read_neighborhood_change(year = year)
   final <- final %>% left_join(change, by = 'fips')
 
+  # for exlcuded geos, assign NA to chart variables
+  final <- final %>%
+    mutate_at(.vars = c('pct_above_200_pov',
+                        'pct_bachelors_plus',
+                        'pct_employed',
+                        'home_value',
+                        'math_prof',
+                        'read_prof',
+                        'grad_rate',
+                        'pct_not_frpm',
+                        'env_site_score',
+                        'pct_below_pov',
+                        'pct_asian',
+                        'pct_black',
+                        'pct_hispanic',
+                        'pct_poc',
+                        'trct_raceeth_chng0021',
+                        'trct_raceeth_chng1321',
+                        'trct_inc_chng0021',
+                        'trct_inc_chng1321',
+                        'trct_pctchng_medrent1321'
+                        # also exclude Alpine, which only has 1 block group
+    ), funs(ifelse(exclude_flag == 1 | county_name == 'Alpine', NA, .)))
+
   # return reduced dataframe of map vars by default
   if(reduced == FALSE){
     final <- final
@@ -141,8 +178,9 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
         density_flag,
         military_flag,
         prison_flag,
+        exclude_flag,
         # opp indicators
-        pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'),
+        pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), total_valid,
         # pov and seg indicators
         pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
         pct_asian, pct_black, pct_hispanic, pct_poc,
