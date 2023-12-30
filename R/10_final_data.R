@@ -141,6 +141,8 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
   final <- final %>% left_join(change, by = 'fips')
 
   # for exlcuded geos, assign NA to chart variables
+  change_cols <- colnames(change[, !names(change) %in% c("fips")])
+
   final <- final %>%
     mutate_at(.vars = c('pct_above_200_pov',
                         'pct_bachelors_plus',
@@ -160,7 +162,8 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
                         'trct_raceeth_chng1321',
                         'trct_inc_chng0021',
                         'trct_inc_chng1321',
-                        'trct_pctchng_medrent1321'
+                        'trct_pctchng_medrent1321',
+                        change_cols
                         # also exclude Alpine, which only has 1 block group
     ), funs(ifelse(exclude_flag == 1 | county_name == 'Alpine', NA, .)))
 
@@ -221,7 +224,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
       rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
       final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
 
-      #return(final_geo)
+     return(final_geo)
 
       if(write == TRUE){
         sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
@@ -411,7 +414,7 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
     final_prep$conpovflag <- ifelse(final_prep$pct_below_pov >= 0.3, 1, 0)
     final_prep$pov_seg_flag <- ifelse((final_prep$racial_seg == 1 &
                                     final_prep$conpovflag == 1), 1, 0)
-
+    final_prep$pov_seg_flag[which(is.na(final_prep$conpovflag))] <- NA
 
 
 
