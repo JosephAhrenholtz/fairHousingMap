@@ -6,7 +6,13 @@
 \alias{final_prepare}
 \title{Returns the final TCAC data frame output}
 \usage{
-final_opp(year = current_year, write = FALSE, reduced = TRUE, as_geo = FALSE)
+final_opp(
+  year = current_year,
+  write = FALSE,
+  reduced = TRUE,
+  as_geo = FALSE,
+  cog = FALSE
+)
 
 final_raw(
   year = current_year,
@@ -23,6 +29,8 @@ final_prepare(year = current_year, geo = "tract", .data = NULL)
 \item{write}{write the final output}
 
 \item{as_geo}{logical to return sf object}
+
+\item{cog}{logical to write COG referenced shapefile for HCD AFFH Data Viewer.  Is tract-only.  Counties within COG are COG-referenced.  Counties outside of COGS are county-referenced.}
 
 \item{geo}{allows for opportunity to be assessed at the tract level in urban areas and block group in rural areas}
 

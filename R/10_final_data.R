@@ -13,6 +13,7 @@
 #' @param write write the final output
 #' @param output `reduced` returns only variables necessary for the map.  If `full`, return all intermediate variables.
 #' @param as_geo logical to return sf object
+#' @param cog logical to write COG referenced shapefile for HCD AFFH Data Viewer.  Is tract-only.  Counties within COG are COG-referenced.  Counties outside of COGS are county-referenced.
 #'
 #'
 #' @return a data frame
@@ -27,25 +28,38 @@
 #'
 #'
 #' @export
-final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo = FALSE){
+final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo = FALSE, cog  = FALSE){
 
   # load and combine urban tracts and rural block groups
-  urban <- final_prepare(year, geo='tract') %>% dplyr::filter(region != 'Rural Areas')
-  rural <- final_prepare(year, geo='bg') %>% dplyr::filter(region == 'Rural Areas')
-  final <- dplyr::bind_rows(urban, rural)
+  # urban <- final_prepare(year, geo='tract') %>% dplyr::filter(region != 'Rural Areas')
+  # rural <- final_prepare(year, geo='bg') %>% dplyr::filter(region == 'Rural Areas')
+  # final <- dplyr::bind_rows(urban, rural)
 
+  if(cog==FALSE){
+    # load tracts and bgs separately for standard scoring
+    urban <- final_prepare(year, geo='tract') %>% dplyr::filter(region != 'Rural Areas')
+    rural <- final_prepare(year, geo='bg') %>% dplyr::filter(region == 'Rural Areas')
+    final <- dplyr::bind_rows(urban, rural) %>%
+      mutate(regionid = ifelse(region == "Rural Areas", county_name, region))
+  } else {
+    # load only tracts for cog-referenced map
+    filepaths()
+    final <- final_prepare(year, geo='tract') %>% select(-region)
+    cog_region <-  read_zip(county_cog_xwalk, year, col_types = readr::cols())
+    final <- final %>% left_join(cog_region, by = "county_name") %>%
+      mutate(regionid = ifelse(region == "Rural Areas", county_name, region))
+
+  }
+
+  # reaarange cols
   final <- final %>%
-    select(dplyr::contains('fips'), region, county_name, # geographic information
+    select(dplyr::contains('fips'), region, regionid, county_name, # geographic information
            pct_above_200_pov, home_value, pct_bachelors_plus, pct_employed, # economic
            math_prof, read_prof, grad_rate, pct_not_frpm, ## educational
            env_site_score, # environmental
            everything()
     )
 
-
-  # assign region id
-  final <- final %>%
-    mutate(regionid = ifelse(region == "Rural Areas", county_name, region))
 
 
   # assign above/below regional median for economic/educational indicators
@@ -130,121 +144,148 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
   final$oppcat <- factor(final$oppcat, levels = levels)
 
 
+  # if cog is true, write file for cog-referenced map
+  if(cog == TRUE){
 
-  # add poverty and env hazard threshold for interface charts
-  final <- final %>%
-    mutate(high_pov_thresh = .3, seg_thresh = 1.25)
+    final_geo <- final %>% left_join(shape_CA_tract, by = c('fips', 'county_name')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
 
+    final_geo <- final_geo %>% select('FIPS' = 'fips', `Opportunity Category` = 'oppcat', `Opportunity Score` = 'oppscore',
+                                      `Share > 200% Poverty Score` = 'pct_above_200_pov_score',
+                                      `Share with Bachelors+ Score` = 'pct_bachelors_plus_score',
+                                      `Employment Rate Score` = 'pct_employed_score',
+                                      `Median Home Value Score` = 'home_value_score',
+                                      `Share Proficient in Math Score` = 'math_prof_score',
+                                      `Share Proficient in Reading Score` = 'read_prof_score',
+                                      `High School Grad Rate Score` = 'grad_rate_score',
+                                      `Students not in Poverty Score` = 'pct_not_frpm_score',
+                                      `Environmental Score` = 'env_site_score',
+                                      `High-Poverty & Segregated` = 'pov_seg_flag',
+                                      `County Name` = 'county_name',
+                                      `Region Code` = 'regionid')
 
-  # join neighborhood change of non-rural tracts
-  change <- read_neighborhood_change(year = year)
-  final <- final %>% left_join(change, by = 'fips')
-
-  # for exlcuded geos, assign NA to chart variables
-  change_cols <- colnames(change[, !names(change) %in% c("fips")])
-
-  final <- final %>%
-    mutate_at(.vars = c('pct_above_200_pov',
-                        'pct_bachelors_plus',
-                        'pct_employed',
-                        'home_value',
-                        'math_prof',
-                        'read_prof',
-                        'grad_rate',
-                        'pct_not_frpm',
-                        'env_site_score',
-                        'pct_below_pov',
-                        'pct_asian',
-                        'pct_black',
-                        'pct_hispanic',
-                        'pct_poc',
-                        'trct_raceeth_chng0021',
-                        'trct_raceeth_chng1321',
-                        'trct_inc_chng0021',
-                        'trct_inc_chng1321',
-                        'trct_pctchng_medrent1321',
-                        change_cols
-                        # also exclude Alpine, which only has 1 block group
-    ), funs(ifelse(exclude_flag == 1 | county_name == 'Alpine', NA, .)))
-
-  # return reduced dataframe of map vars by default
-  if(reduced == FALSE){
-    final <- final
-  } else {
-    final <- final %>%
-      select(
-        # geo
-        starts_with('fips'), region, regionid, county_name,
-        # basic population
-        total_pop,
-        pop_density,
-        density_flag,
-        military_flag,
-        prison_flag,
-        exclude_flag,
-        # opp indicators
-        pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), total_valid,
-        # pov and seg indicators
-        pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
-        pct_asian, pct_black, pct_hispanic, pct_poc,
-        asian_seg_thresh, black_seg_thresh, hispanic_seg_thresh, poc_seg_thresh,
-        # score/designations
-        oppscore, oppcat, pov_seg_flag,
-        # neighborhood change
-        baseline_raceinc0021,
-        baseline_race1321,
-        baseline_income1321,
-        part1,
-        part2,
-        nbrhood_chng,
-        trct_raceeth_chng0021,
-        trct_raceeth_chng1321,
-        trct_inc_chng0021,
-        trct_inc_chng1321,
-        halfmile_buffer,
-        raceeth_half0021,
-        raceeth_half1321,
-        inc_half0021,
-        inc_half1321,
-        rent_quarter1321,
-        trct_pctchng_medrent1321)
-
-    # limit digits to 4 to minimize file size
-    final <- final %>% mutate_if(is.numeric,
-                             round,
-                             digits = 4)
-
-    # option to write geojson
-    if(as_geo == TRUE){
-      #final <- final %>% select(-ends_with('_score'))
-      urban <- final %>% filter(is.na(fips_bg))
-      rural <- final %>% filter(!is.na(fips_bg))
-
-      urban_geo <- urban %>% left_join(shape_CA_tract, by = c('fips', 'county_name')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
-      rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
-      final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
-
-      if(write == TRUE){
-        sf::st_write(final_geo, paste0("output/", year, "/final_", year, '.geojson'))
-      }
-
-     return(final_geo)
-
-
-
-
-
+    # remove the gpkg file if it exists, then write
+    file_name <- paste0("output/", year, "/final_cog_", year, '.gpkg')
+    if(file.exists(file_name)){
+      file.remove(file_name)
     }
+    sf::st_write(final_geo, file_name)
+
+  # otherwise continue processing for standard map
+  } else {
+
+    # add poverty and env hazard threshold for interface charts
+    final <- final %>%
+      mutate(high_pov_thresh = .3, seg_thresh = 1.25)
+
+
+    # join neighborhood change of non-rural tracts
+    change <- read_neighborhood_change(year = year)
+    final <- final %>% left_join(change, by = 'fips')
+
+    # for exlcuded geos, assign NA to chart variables
+    change_cols <- colnames(change[, !names(change) %in% c("fips")])
+
+    final <- final %>%
+      mutate_at(.vars = c('pct_above_200_pov',
+                          'pct_bachelors_plus',
+                          'pct_employed',
+                          'home_value',
+                          'math_prof',
+                          'read_prof',
+                          'grad_rate',
+                          'pct_not_frpm',
+                          'env_site_score',
+                          'pct_below_pov',
+                          'pct_asian',
+                          'pct_black',
+                          'pct_hispanic',
+                          'pct_poc',
+                          'trct_raceeth_chng0021',
+                          'trct_raceeth_chng1321',
+                          'trct_inc_chng0021',
+                          'trct_inc_chng1321',
+                          'trct_pctchng_medrent1321',
+                          change_cols
+                          # also exclude Alpine, which only has 1 block group
+      ), funs(ifelse(exclude_flag == 1 | county_name == 'Alpine', NA, .)))
+
+
+    # return reduced is false return the full data frame
+    if(reduced == FALSE){
+      return(final)
+
+    # otherwise reduce to vars necessary for mapping interface
+    } else {
+      final <- final %>%
+        select(
+          # geo
+          starts_with('fips'), region, regionid, county_name,
+          # basic population
+          total_pop,
+          pop_density,
+          density_flag,
+          military_flag,
+          prison_flag,
+          exclude_flag,
+          # opp indicators
+          pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), total_valid,
+          # pov and seg indicators
+          pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
+          pct_asian, pct_black, pct_hispanic, pct_poc,
+          asian_seg_thresh, black_seg_thresh, hispanic_seg_thresh, poc_seg_thresh,
+          # score/designations
+          oppscore, oppcat, pov_seg_flag,
+          # neighborhood change
+          baseline_raceinc0021,
+          baseline_race1321,
+          baseline_income1321,
+          part1,
+          part2,
+          nbrhood_chng,
+          trct_raceeth_chng0021,
+          trct_raceeth_chng1321,
+          trct_inc_chng0021,
+          trct_inc_chng1321,
+          halfmile_buffer,
+          raceeth_half0021,
+          raceeth_half1321,
+          inc_half0021,
+          inc_half1321,
+          rent_quarter1321,
+          trct_pctchng_medrent1321)
+
+      # limit digits to 4 to minimize file size
+      final <- final %>% mutate_if(is.numeric,
+                                   round,
+                                   digits = 4)
+
+      # write final spatial data
+      if(as_geo == TRUE){
+        urban <- final %>% filter(is.na(fips_bg))
+        rural <- final %>% filter(!is.na(fips_bg))
+
+        urban_geo <- urban %>% left_join(shape_CA_tract, by = c('fips', 'county_name')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
+        rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
+        final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
+
+        if(write == TRUE){
+          # remove the geojson file if it exists
+          file_name <- paste0("output/", year, "/final_", year, '.geojson')
+          if(file.exists(file_name)){
+            file.remove(file_name)
+          }
+          sf::st_write(final_geo, file_name)
+        }
+        return(final_geo)
+      }
+    }
+
+    #write final non-spatial data
+    if(write)readr::write_csv(final, paste0("output/", year, "/final_", year, '.csv'))
+    return(final)
+
   }
-
-  #write final file
-  if(write)readr::write_csv(final, paste0("output/", year, "/final_", year, '.csv'))
-  return(final)
-
-
 }
-
-
 
 
 # everything below this line is an input to the final_opp function

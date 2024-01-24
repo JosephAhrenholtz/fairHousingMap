@@ -40,6 +40,7 @@ if(year >= 2024){
   # region
   assign("USDA_excluded", c('data-raw/shapefiles/2021/SFH_MFH_Ineligible_20211117/SFH_MFH_Ineligible.shp'), parent.frame())
   assign("county_region_xwalk", c(2019, "county-region_xwalk.csv"), parent.frame())
+  assign("county_cog_xwalk", c(2019, "county-cog-xwalk.csv"), parent.frame())
 
   # neighborhood change
   assign("nc_scores", c(2024, "neighborhood_change_layer_2024.csv"), parent.frame())

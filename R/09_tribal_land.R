@@ -21,6 +21,9 @@
 
 tribal_overlap <- function(){
 
+  # turn spherical geometry off
+  sf_use_s2(FALSE)
+
   # load reservation data from the census
   reservations_sf <- native_areas(year = 2021) %>% st_transform(4326)
 
@@ -33,7 +36,6 @@ tribal_overlap <- function(){
     st_as_sf()
 
   # compute tract intersection with tribal lands
-  sf_use_s2(FALSE)
   tract_intersect_pct <-
     shape_CA_tract %>%
     st_as_sf() %>%
