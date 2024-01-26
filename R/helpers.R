@@ -108,3 +108,8 @@ map_theme <- function(base_size = 12, title_size = 12) {
     strip.text.x = element_text(size = 14))
 }
 
+
+opp_pallette <- function(){
+  return(c('#234EA0', '#2897BF', '#73C9BD', '#D5EEB3'))
+}
+

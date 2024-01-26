@@ -30,11 +30,6 @@
 #' @export
 final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo = FALSE, cog  = FALSE){
 
-  # load and combine urban tracts and rural block groups
-  # urban <- final_prepare(year, geo='tract') %>% dplyr::filter(region != 'Rural Areas')
-  # rural <- final_prepare(year, geo='bg') %>% dplyr::filter(region == 'Rural Areas')
-  # final <- dplyr::bind_rows(urban, rural)
-
   if(cog==FALSE){
     # load tracts and bgs separately for standard scoring
     urban <- final_prepare(year, geo='tract') %>% dplyr::filter(region != 'Rural Areas')
@@ -51,7 +46,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 
   }
 
-  # reaarange cols
+  # rearrange cols
   final <- final %>%
     select(dplyr::contains('fips'), region, regionid, county_name, # geographic information
            pct_above_200_pov, home_value, pct_bachelors_plus, pct_employed, # economic
