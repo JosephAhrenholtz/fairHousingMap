@@ -46,8 +46,8 @@ if(year >= 2024){
   assign("nc_scores", c(2024, "neighborhood_change_layer_2024.csv"), parent.frame())
 
   # supplementary data
-  assign("pres_db_location", c('data-raw/shapefiles/2023/chpc_pdb/\\2023 AH Inventory Shapefile_NAD83.shp'), parent.frame())
-  assign("pres_db_attributes", c('data-raw/shapefiles/2023/chpc_pdb/\\OBI PDB Request_012224.xlsx'), parent.frame())
+  assign("pres_db_locations", c('data-raw/shapefiles/2024/chpc_pdb/OBI_presdb_geocoded_03202024.csv'), parent.frame())
+  assign("pres_db_attributes", c('data-raw/shapefiles/2024/chpc_pdb/\\OBI PDB Request_012224.xlsx'), parent.frame())
   assign("segcat", c(2020, "cat_seg_ca_2020.csv"), parent.frame())
 
 }
