@@ -43,7 +43,7 @@ if(year >= 2024){
   assign("county_cog_xwalk", c(2019, "county-cog-xwalk.csv"), parent.frame())
 
   # neighborhood change
-  assign("nc_scores", c(2024, "neighborhood_change_layer_2024.csv"), parent.frame())
+  assign("nc_scores", c("R/neighborhood_change/2024/Results/Neighborhood Change Layer/neighborhood_change_layer_2024.csv"), parent.frame())
 
   # supplementary data
   assign("pres_db_locations", c('data-raw/shapefiles/2024/chpc_pdb/OBI_presdb_geocoded_03202024.csv'), parent.frame())

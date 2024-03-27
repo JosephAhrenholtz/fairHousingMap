@@ -20,37 +20,50 @@
 #' @export
 read_neighborhood_change <- function(year = current_year){
   filepaths(year=year)
+  change_all <- read_csv(nc_scores)
 
-  change_all <- read_zip(nc_scores, year, col_types = readr::cols())
-
-  change <- change_all %>%
-    dplyr::rename('fips' = tract2020) %>%
-    dplyr::select(fips,
-                  rural_flag,
-                  baseline_raceinc0021,
-                  baseline_race1321,
-                  baseline_income1321,
-                  part1,
-                  part2,
-                  nbrhood_chng,
-                  trct_raceeth_chng0021,
-                  trct_raceeth_chng1321,
-                  trct_inc_chng0021,
-                  trct_inc_chng1321,
-                  halfmile_buffer,
-                  raceeth_half0021,
-                  raceeth_half1321,
-                  inc_half0021,
-                  inc_half1321,
-                  rent_quarter1321,
-                  trct_pctchng_medrent1321
+  change_cols <- c(
+    'baseline_raceinc0021',
+    'baseline_race1321',
+    'baseline_income1321',
+    'part1',
+    'part2',
+    'nbrhood_chng',
+    'trct_raceeth_chng0021',
+    'trct_raceeth_chng1321',
+    'trct_inc_chng0021',
+    'trct_inc_chng1321',
+    'halfmile_buffer',
+    'raceeth_half0021',
+    'raceeth_half1321',
+    'raceeth_quarter1321',
+    'inc_half0021',
+    'inc_half1321',
+    'inc_quarter1321',
+    'trct_pctchng_medrent1321',
+    'rent_half1321',
+    'medrent_disp1321',
+    'income_percentile',
+    'hval_percentile',
+    'pct_gap',
+    'hvalinc_gap',
+    'part3',
+    'exclusion_flag'
   )
 
-  # insert NA for rural areas
+  change <- change_all %>%
+    dplyr::select('fips' = 'tract2020',
+                  all_of(change_cols))
+
+  # insert NA for excluded areas
   change <- change %>%
-    mutate_at(vars(baseline_raceinc0021:trct_pctchng_medrent1321), ~
-                replace(., rural_flag == 1, NA)) %>%
-    select(-rural_flag)
+    mutate_at(vars(change_cols), ~
+                replace(., exclusion_flag == 1, NA)) %>%
+    rename(
+      'path_1a' = part1,
+      'path_1b' = part3,
+      'path_2' = part2,
+      'nc_exclude_flag' = exclusion_flag)
 
   return(change)
 }

@@ -168,20 +168,18 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
   # otherwise continue processing for standard map
   } else {
 
-    # add poverty and env hazard threshold for interface charts
+    # add additional variables needed for side panel
     final <- final %>%
-      mutate(high_pov_thresh = .3, seg_thresh = 1.25)
+      mutate(high_pov_thresh = .3,
+             college_flag = if_else(pct_college >= .25, 1, 0))
 
 
     # join neighborhood change of non-rural tracts
     change <- read_neighborhood_change(year = year)
     final <- final %>% left_join(change, by = 'fips')
 
-    # for exlcuded geos, assign NA to chart variables
-    change_cols <- colnames(change[, !names(change) %in% c("fips")])
-
-    final <- final %>%
-      mutate_at(.vars = c('pct_above_200_pov',
+    # save cols for selection
+    opp_cols <- c('pct_above_200_pov',
                           'pct_bachelors_plus',
                           'pct_employed',
                           'home_value',
@@ -194,15 +192,15 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
                           'pct_asian',
                           'pct_black',
                           'pct_hispanic',
-                          'pct_poc',
-                          'trct_raceeth_chng0021',
-                          'trct_raceeth_chng1321',
-                          'trct_inc_chng0021',
-                          'trct_inc_chng1321',
-                          'trct_pctchng_medrent1321',
-                          change_cols
+                          'pct_poc')
+    change_cols <- colnames(change[, !names(change) %in% c("fips")])
+    chart_cols <- c(opp_cols, change_cols)
+
+    # apply exclusion flag to all chart variables
+    final <- final %>%
+      mutate_at(.vars = chart_cols,
                           # also exclude Alpine, which only has 1 block group
-      ), funs(ifelse(exclude_flag == 1 | county_name == 'Alpine', NA, .)))
+                          funs(ifelse(exclude_flag == 1 | county_name == 'Alpine', NA, .)))
 
 
     # return reduced is false return the full data frame
@@ -222,32 +220,17 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
           military_flag,
           prison_flag,
           exclude_flag,
+          college_flag, # only used to exclude nc
           # opp indicators
           pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), total_valid,
           # pov and seg indicators
-          pct_below_pov, high_pov_thresh, starts_with('lq_'), seg_thresh,
+          pct_below_pov, high_pov_thresh, starts_with('lq_'),
           pct_asian, pct_black, pct_hispanic, pct_poc,
           asian_seg_thresh, black_seg_thresh, hispanic_seg_thresh, poc_seg_thresh,
           # score/designations
           oppscore, oppcat, pov_seg_flag,
           # neighborhood change
-          baseline_raceinc0021,
-          baseline_race1321,
-          baseline_income1321,
-          part1,
-          part2,
-          nbrhood_chng,
-          trct_raceeth_chng0021,
-          trct_raceeth_chng1321,
-          trct_inc_chng0021,
-          trct_inc_chng1321,
-          halfmile_buffer,
-          raceeth_half0021,
-          raceeth_half1321,
-          inc_half0021,
-          inc_half1321,
-          rent_quarter1321,
-          trct_pctchng_medrent1321)
+          all_of(change_cols))
 
       # limit digits to 4 to minimize file size
       final <- final %>% mutate_if(is.numeric,
