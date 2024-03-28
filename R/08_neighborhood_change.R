@@ -52,7 +52,7 @@ read_neighborhood_change <- function(year = current_year){
 
   change <- change_all %>%
     dplyr::select('fips' = 'tract2020',
-                  all_of(change_cols), exclusion_flag)
+                  all_of(change_cols), exclusion_flag, rural_flag)
 
   # final prep
   change <- change %>%
@@ -61,6 +61,8 @@ read_neighborhood_change <- function(year = current_year){
     # apply NA's
     mutate_at(vars(append(change_cols, 'gap_thresh')), ~
                 replace(., exclusion_flag == 1, NA)) %>%
+    mutate_at(vars(append(change_cols, 'gap_thresh')), ~
+                replace(., rural_flag == 1, NA)) %>%
     # rename based on final methodology
     rename(
       'path_1a' = part1,
@@ -68,7 +70,9 @@ read_neighborhood_change <- function(year = current_year){
       'path_2' = part2,
       'nc_exclude_flag' = exclusion_flag) %>%
     # relocate gap field
-    relocate(gap_thresh, .after = pct_gap)
+    relocate(gap_thresh, .after = pct_gap) %>%
+    # drop rural flag
+    select(-rural_flag)
 
   return(change)
 }
