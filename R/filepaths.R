@@ -42,8 +42,9 @@ if(year >= 2024){
   assign("county_region_xwalk", c(2019, "county-region_xwalk.csv"), parent.frame())
   assign("county_cog_xwalk", c(2019, "county-cog-xwalk.csv"), parent.frame())
 
-  # neighborhood change
-  assign("nc_scores", c("R/neighborhood_change/2024/Results/Neighborhood Change Layer/neighborhood_change_layer_2024.csv"), parent.frame())
+  # neighborhood change - get updated code from Matt that includes baseline_race0021.  He sent file but not updated code.
+  #assign("nc_scores", c("R/neighborhood_change/2024/Results/Neighborhood Change Layer/neighborhood_change_layer_2024.csv"), parent.frame())
+  assign("nc_scores", c("R/neighborhood_change/2024/Results/Neighborhood Change Layer/neighborhood_change_layer_04042024.csv"), parent.frame())
 
   # supplementary data
   assign("pres_db_locations", c('data-raw/shapefiles/2024/chpc_pdb/OBI_presdb_geocoded_03202024.csv'), parent.frame())

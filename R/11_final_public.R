@@ -183,7 +183,9 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
                           "county_name",
 
                           # pathway 1a
-                          "baseline_raceinc0021",
+                          #"baseline_raceinc0021",
+                          "baseline_race0021",
+                          "baseline_income0021",
                           "trct_raceeth_chng0021",
                           "raceeth_half0021",
                           "trct_inc_chng0021",
@@ -221,7 +223,9 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
         "County Name",
 
         # pathway 1a
-        "Binary flag if tract was a LMI and BIPOC neighborhood in 2000",
+        #"Binary flag if tract was a LMI and POC neighborhood in 2000",
+        "Binary flag if tract was a POC neighborhood in 2000",
+        "Binary flag if tract was a LMI neighborhood in 2000",
         "Percentage point change in tract's non-Hispanic white population (2000-2021)",
         "Countywide 50% threshold for non-Hispanic white tract-level percentage point increase (2000-2021)",
         "Percentage point change in tract's above-moderate-income households (2000-2021)",
@@ -229,7 +233,7 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
         "Pathway 1A: Binary flag if a tract meets both racial/ethnic change and economic change between 2000-2021 (50% threshold)",
 
         # pathway 1b
-        "Binary flag if tract was a BIPOC neighborhood in 2013",
+        "Binary flag if tract was a POC neighborhood in 2013",
         "Binary flag if tract was a LMI neighborhood in 2013",
         "Percentage point change in tract's non-Hispanic white population (2013-2021)",
         "Countywide 75% threshold for non-Hispanic white tract-level percentage point increase (2013-2021)",
@@ -271,7 +275,9 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
                                     County = county_name,
 
                                     # Pathway 1A
-                                    `Binary Flag - Historic POC & LMI neighborhood in 2000 (baseline criteria)` = baseline_raceinc0021,
+                                    #`Binary Flag - Historic POC & LMI neighborhood in 2000 (baseline criteria)` = baseline_raceinc0021,
+                                    `Binary Flag - Binary flag if tract was a POC neighborhood in 2000` = baseline_race0021,
+                                    `Binary Flag - Binary flag if tract was a LMI neighborhood in 2000` = baseline_income0021,
                                     `2000-2021 Non-Hispanic White Share Change (pp)` = trct_raceeth_chng0021,
                                     `2000-2021 County 50% Threshold for Non-Hispanic White Share Change (pp)` = raceeth_half0021,
                                     `2000-2021 High-Income Share Chage (pp)` = trct_inc_chng0021,
@@ -279,7 +285,7 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
                                     `Binary Flag - Meets Pathway 1A Definition` = path_1a,
 
                                     # Pathway 1B
-                                    `Binary Flag - Binary flag if tract was a BIPOC neighborhood in 2013` = baseline_race1321,
+                                    `Binary Flag - Binary flag if tract was a POC neighborhood in 2013` = baseline_race1321,
                                     `Binary Flag - Binary flag if tract was a LMI neighborhood in 2013` = baseline_income1321,
                                     `2013-2021 Non-Hispanic White Share Change (pp)` = trct_raceeth_chng1321,
                                     `2013-2021 County 75% Threshold for Non-Hispanic White Share Change (pp)` = raceeth_quarter1321,
@@ -288,7 +294,7 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
                                     `Binary Flag - Meets Pathway 1B Definition` = path_1b,
 
                                     # Pathway 2
-                                    `Binary Flag - Within 1/2-mile of long-term change tract (Part 1)` = halfmile_buffer,
+                                    `Binary Flag - Within 1/2-mile of Pathway 1A tract` = halfmile_buffer,
                                     `2013-2021 County 50% Threshold for Non-Hispanic White Share Change (pp)` = raceeth_half1321,
                                     `2013-2021 County 50% Threshold for High-Income Share Chage (pp)` = inc_half1321,
                                     `2013-2021 Median Rent Change (%)` = trct_pctchng_medrent1321,

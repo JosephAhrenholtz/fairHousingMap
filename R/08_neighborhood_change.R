@@ -24,7 +24,9 @@ read_neighborhood_change <- function(year = current_year){
 
   change_cols <- c(
     # pathway 1A
-    'baseline_raceinc0021',
+    #'baseline_raceinc0021',
+    'baseline_race0021',
+    'baseline_income0021',
     'trct_raceeth_chng0021',
     'raceeth_half0021',
     'trct_inc_chng0021',
