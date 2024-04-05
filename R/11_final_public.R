@@ -304,7 +304,7 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
                                     `Binary Flag - Meets Pathway 2 Definition` = path_2,
 
                                     # nc flag
-                                    `Binary Flag - Meets Pathway 1A, Pathway 1B, or Pathway Definition` = nbrhood_chng,
+                                    `Binary Flag - Meets Pathway 1A, Pathway 1B, or Pathway 2 Definition` = nbrhood_chng,
 
                                     # Exclusion flag
                                     `Binary Flag - Tract has unreliable data or meets other exclusion parameters` = nc_exclude_flag
