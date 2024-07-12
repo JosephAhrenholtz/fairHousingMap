@@ -226,7 +226,8 @@ read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = F
       # adult education
       pct_bachelors_plus_  = (B15003_022E + B15003_023E + B15003_024E + B15003_025E)/B15003_001E,
       # county names
-      county_name = sub('(Block Group \\d+, )?Census Tract \\d+\\.*\\d*, ', '', NAME),
+      county_name = case_when(acs_year <= 2021 ~ sub('(Block Group \\d+, )?Census Tract \\d+\\.*\\d*, ', '', NAME), # Handles comma separators used prior to ACS 2022
+                              acs_year > 2021 ~ sub('(Block Group \\d+; )?Census Tract \\d+\\.*\\d*; ', '', NAME)), # Handles semi-colon separators used as of ACS 2022
       county_name = gsub(' County.*', '', county_name),
       # military population
       pct_military_ = B23025_006E/B23025_001E
