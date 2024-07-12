@@ -19,6 +19,7 @@
 #'
 #'
 #' @source USDA areas ineligible for rural development housing programs: https://www.sc.egov.usda.gov/data/data_files.html
+#' @note as of 06/2024, eligibility file is downloading as a geodatabase with null values in the state name field.  The "_CA" suffixed file was pre-processed in ArcGIS.  May consider reaching out to someone at USDS to see why fields are null before publishing.
 #' @source Changes in 2019 detailed: https://www.rd.usda.gov/files/CA-SFH-NoticeRuralAreaReview-Final-4.16.18.pdf
 #'
 
