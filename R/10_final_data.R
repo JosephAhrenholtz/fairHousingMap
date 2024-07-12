@@ -203,9 +203,23 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
                           funs(ifelse(exclude_flag == 1 | county_name == 'Alpine', NA, .)))
 
 
-    # return reduced is false return the full data frame
+    # return reduced is false return the full data frame with geo
     if(reduced == FALSE){
-      return(final)
+      urban <- final %>% filter(is.na(fips_bg))
+      rural <- final %>% filter(!is.na(fips_bg))
+
+      urban_geo <- urban %>% left_join(shape_CA_tract, by = c('fips', 'county_name')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
+      rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
+      final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
+
+      if(write == TRUE){
+        # remove the geojson file if it exists
+        file_name <- paste0("output/", year, "/final_full_", year, '.geojson')
+        if(file.exists(file_name)){
+          file.remove(file_name)
+        }
+        sf::st_write(final_geo, file_name)
+      }
 
     # otherwise reduce to vars necessary for mapping interface
     } else {
