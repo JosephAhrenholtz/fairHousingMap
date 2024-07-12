@@ -96,8 +96,8 @@ graduation_rates <- function(year = current_year, write = FALSE,
     #cohort graduation rates
     graduation <- read_zip(name = ED_cohort, type = 'tsv', year = year, guess_max = 10000,
       col_types = readr::cols(), na = c("", "NA", '*'))
-    #only include totals from districts COEs, and direct funded charters
-    graduation <- dplyr::filter(graduation, AggregateLevel == 'S' & CharterSchool == 'All' &
+    #filter for school-level aggregation, charter and non-charter schools, without DASS status, and total reporting category
+    graduation <- dplyr::filter(graduation, AggregateLevel == 'S' & (CharterSchool == 'Yes' | CharterSchool == 'No') &
         DASS == 'No' & ReportingCategory == 'TA') %>%
       dplyr::mutate(CDS = paste0(CountyCode, DistrictCode, SchoolCode),
         enrollment = CohortStudents, grad_rate = `Regular HS Diploma Graduates (Rate)`,
