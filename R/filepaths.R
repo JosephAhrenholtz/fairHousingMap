@@ -52,5 +52,21 @@ if(year >= 2024){
   assign("segcat", c(2020, "cat_seg_ca_2020.csv"), parent.frame())
 
 }
+
+if(year >= 2025){
+
+  # economic
+  assign("acs_variables", c(2022, 'acs22_variables.csv'), parent.frame())
+  # education
+  assign("ED_english_math", c(2023, "sb_ca2023_1_csv_v1.txt"), parent.frame())
+  assign("ED_cohort", c(2023, "acgr23-v2.txt"), parent.frame())
+  assign("pubschls", c(2024, "pubschls24.txt"), parent.frame())
+  assign("frpm", c(2024, "frpm2324.xlsx"), parent.frame())
+
+  # region
+  assign("USDA_excluded", c('data-raw/shapefiles/2023/SFH_MFH_Ineligible20231206/SFH_MFH_IELG2020_CA.shp'), parent.frame())
+}
+
+
 }
 
