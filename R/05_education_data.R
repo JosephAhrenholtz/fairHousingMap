@@ -60,8 +60,18 @@ read_educ_pov <- function(year = current_year) {
                                   county_name = `County.Name`)
 
   #english/math proficiency
-  english_math <- read_zip(ED_english_math, year,
-                                  col_types = readr::cols(), progress = FALSE, type = 'delim')
+  if(year == 2023){
+    # 2023 data has a different delimiter and test id column name
+    english_math <- read_zip(ED_english_math, year,
+                             col_types = readr::cols(), progress = FALSE)
+    english_math <- english_math %>%
+      rename(`Test ID` = `Test Id`)
+  } else {
+    english_math <- read_zip(ED_english_math, year,
+                             col_types = readr::cols(), progress = FALSE, type = 'delim')
+  }
+
+
   english_math <- tidyr::unite(english_math, CDSCode, `County Code`, `District Code`, `School Code`,
                                sep = '', remove = FALSE)
   #subset 4th grade english & math tests
