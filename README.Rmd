@@ -1,26 +1,24 @@
 ---
 title: "README"
 output: github_document
-date: "2023-08-08"
+date: "2024-08-19"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = F, echo = T, message = F)
 ```
 
-## Fair Housing Map
+## AFFH Mapping Tool
 
-In process documentation for CTCAC/HCD Opportunity and Neighborhood Change Map package, temporarily called the "Fair Housing Map" until directed further by CTCAC and HCD. Please see the [draft methodology](https://docs.google.com/document/d/1_wk_B9l0ZVSAr6bSoVROc7xuwTteyJxc/edit?usp=sharing&ouid=106736372141423442162&rtpof=true&sd=true) for details on the mapping approach.
+Documentation for AFFH Mapping Tool, which includes CTCAC/HCD Opportunity and Neighborhood Change mapping layers.
 
 ### Installation
 
-1.  Clone repository
+1.  Clone GitHub repository and download data-raw directory from [Box](https://berkeley.app.box.com/folder/224592265510) and extract into root directory. Alternatively, use project folder provided in Box.
 
-2.  Download data-raw directory and extract into root directory: <https://berkeley.app.box.com/folder/224592265510>
+2.  Open package using "fairHousingMap.Rproj" file
 
-3.  Open package using "fairHousingMap.Rproj" file
-
-4.  Load package and install dependencies:
+3.  Load package and install dependencies:
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
 devtools::install_dev_deps()
@@ -32,7 +30,7 @@ devtools::load_all()
 
 ### Final Dataset
 
-The final dataset can be loaded by calling `data(final_2024)`. All variables are documented and the data dictionary can be loaded using `?final_opp_data`.
+The most recent dataset can be loaded by calling `data(final_2025)`. All variables are documented in the the data dictionary which can be loaded using `?data_dict_2025`.
 
 ### Census API
 
@@ -62,13 +60,7 @@ The final dataset can be loaded by calling `data(final_2024)`. All variables are
 
 ### TODO
 
--   Develop testthat test suite (in progress as of 9/4/2023).
 -   The legacy packages maptools, rgdal, and rgeos, underpinning the sp package, which is a dependency, will retire in October 2023. Replace functions that depend on sp with sf package equivalents.
-
-```{r, results='hide', message=FALSE, warning=FALSE}
-#SSN (9/27): needed to add this cell so that filepaths are called in
-filepaths()
-```
 
 ### Running the package
 
@@ -146,8 +138,4 @@ Contains `final_opp()` which loads and combines all intermediate files of econom
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
 final_opp()
-```
-
-```{r, results='hide', message=FALSE, warning=FALSE}
-mapview::mapview(final_opp(as_geo = T), zcol = 'oppcat') # to map the output
 ```
