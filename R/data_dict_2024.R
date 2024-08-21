@@ -34,7 +34,7 @@
 #'   \item read_prof_median: Binary score where 1 denotes the indicator is above the regional median.
 #'   \item grad_rate_score: Binary score where 1 denotes the indicator is above the regional median.
 #'   \item pct_not_frpm_score: Binary score where 1 denotes the indicator is above the regional median.
-#'   \item oppscore: Final opportunity score:  0 or –1 = “Highest Resource”; –2 or –3  = “High Resource”; –4 or –5 = “Moderate Resource”; –6 or lower = “Low Resource”.
+#'   \item oppscore: Final opportunity score:  9 or 8 = “Highest Resource”; 7 or 6  = “High Resource”; 5 or 4 = “Moderate Resource”; 3 or lower = “Low Resource”.
 #'   \item pct_below_pov: Percent of population below the federal poverty line.
 #'   \item lq_poc: Location quotient of all people of color relative to the county.
 #'   \item lq_asian: Location quotient of Asian population relative to the county.
@@ -61,8 +61,7 @@
 #'
 #' @docType data
 #' @keywords datasets
-#' @usage ?final_opp_data
-#' @format A data frame with 11,347 rows and 51 variables
+#' @usage ?data_dict_2024
 #'
-#' @name final_opp_data
+#' @name data_dict_2024
 NULL
