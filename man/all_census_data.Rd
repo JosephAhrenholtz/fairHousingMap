@@ -54,6 +54,11 @@ To use the Census APIs, sign up for an API key. Add Census API key to .Renviron 
   `Sys.getenv("CENSUS_KEY")` \cr
   `tidycensus::census_api_key('YOURKEYHERE', overwrite = TRUE, install = TRUE)` \cr
 }
+\note{
+school_distances depends on all_census_data.  The 2023 handle is included in order
+to run 2023 school_distances at 2020 geos, required to implement 3-year rolling averages
+of education data in the 2025 map.
+}
 \examples{
 all_census_data(read = F) # downloads decennial and acs data for the current map year at the tract level
 

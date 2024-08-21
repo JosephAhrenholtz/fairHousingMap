@@ -17,10 +17,4 @@ racial/ethnic and economic change.
 \examples{
 neighborhood_change(year = 2024) # imports neighborhood change output and reduces to necessary variables
 
-
-
-
-}
-\author{
-Matt Alvarez-Nissen `mnissen@chpc.net`
 }

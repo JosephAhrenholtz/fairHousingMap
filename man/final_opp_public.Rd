@@ -11,11 +11,12 @@ final_opp_public(year = current_year, write = FALSE, change = FALSE)
 
 \item{write}{whether to write new opportunity summary files}
 
-\item{change}{whether to write new change summary files
-
-#' @examples
-final_opp_public(year = 2024, write = TRUE, change = TRUE)}
+\item{change}{whether to write new change summary files}
 }
 \description{
 Loads final opportunity and neighborhood change data and creates excel workbook summary files, shapefiles, and data dictionaries
+}
+\examples{
+final_opp_public(year = 2024, write = TRUE, change = TRUE)
+
 }

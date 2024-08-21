@@ -4,7 +4,10 @@
 \alias{tribal_overlap}
 \title{Create tribal land flag}
 \usage{
-tribal_overlap()
+tribal_overlap(year = current_year)
+}
+\arguments{
+\item{year}{designates the map year's filepaths}
 }
 \value{
 a dataframe
@@ -15,7 +18,7 @@ any tract where at least 25 percent of the geography’s land area is within fed
 High-Poverty & Segregated is not assessed in tracts where the tribal land flag is raised.
 }
 \examples{
-tribal_overlap() # loads tracts with flag for tribal land
+tribal_overlap(year = 2024) # loads tracts with flag for tribal land
 
 
 }

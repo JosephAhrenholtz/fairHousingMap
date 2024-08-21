@@ -8,8 +8,7 @@ school_distances(
   year = current_year,
   geo = "tract",
   write = FALSE,
-  read = !write,
-  testing_handle = FALSE
+  read = !write
 )
 }
 \arguments{

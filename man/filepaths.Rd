@@ -15,6 +15,10 @@ filepaths to raw data are loaded into environment
 \description{
 Shortcuts to zipped files in the data-raw directory. See `?read_zip`
 }
+\note{
+Year 2023 filepaths are used to process 2023 OM education data at 2020 geographies, which is required
+for implementation of 3-year rolling education averages.
+}
 \examples{
 filepaths(year = 2024)
 

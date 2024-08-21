@@ -6,20 +6,9 @@
 \alias{final_prepare}
 \title{Returns the final TCAC data frame output}
 \usage{
-final_opp(
-  year = current_year,
-  write = FALSE,
-  reduced = TRUE,
-  as_geo = FALSE,
-  cog = FALSE
-)
+final_opp(year = current_year, write = FALSE, reduced = TRUE, cog = FALSE)
 
-final_raw(
-  year = current_year,
-  geo = "tract",
-  write = FALSE,
-  testing_handle = FALSE
-)
+final_raw(year = current_year, geo = "tract")
 
 final_prepare(year = current_year, geo = "tract", .data = NULL)
 }
@@ -28,13 +17,11 @@ final_prepare(year = current_year, geo = "tract", .data = NULL)
 
 \item{write}{write the final output}
 
-\item{as_geo}{logical to return sf object}
-
 \item{cog}{logical to write COG referenced shapefile for HCD AFFH Data Viewer.  Is tract-only.  Counties within COG are COG-referenced.  Counties outside of COGS are county-referenced.}
 
 \item{geo}{allows for opportunity to be assessed at the tract level in urban areas and block group in rural areas}
 
-\item{output}{`reduced` returns only variables necessary for the map.  If `full`, return all intermediate variables.}
+\item{output}{`reduced` returns only variables necessary for the map.  If `full`, include all intermediate variables.}
 }
 \value{
 a data frame
@@ -44,6 +31,9 @@ a data frame
 `final_prepare` creates the high poverty and segregated designation and flags unreliable data.
 `final_opp` creates the final opportunity scores and designations.  `final_raw` and `final_prepare` are both
 inputs into `final_opp`.  Only `final_opp` is necessary to run for generating new data.
+}
+\note{
+2025 implements a 3-year rolling average of education indicators.  The change is enacted in the final_raw function.
 }
 \examples{
 final_opp(year = 2024, write = TRUE) # writes the final output
