@@ -6,12 +6,14 @@
 #' any tract where at least 25 percent of the geography’s land area is within federally-recognized tribal lands.  In final_data.R,
 #' High-Poverty & Segregated is not assessed in tracts where the tribal land flag is raised.
 #'
+#' @param year designates the map year's filepaths
+#'
 #'
 #' @return a dataframe
 #'
 #'
 #' @examples
-#' tribal_overlap() # loads tracts with flag for tribal land
+#' tribal_overlap(year = 2024) # loads tracts with flag for tribal land
 #'
 #'
 #' @import sf tigris dplyr
@@ -19,13 +21,16 @@
 #' @export
 
 
-tribal_overlap <- function(){
+tribal_overlap <- function(year = current_year){
 
   # turn spherical geometry off
   sf_use_s2(FALSE)
 
+  # match the tigris download to the acs year
+  acs_year <- year-3
+
   # load reservation data from the census
-  reservations_sf <- native_areas(year = 2021) %>% st_transform(4326)
+  reservations_sf <- tigris::native_areas(year = acs_year) %>% st_transform(4326)
 
 
   # reduce reservations to CA
