@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>AFFH Mapping Tool</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="utf-8" />
+
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+
+  <!-- mapbox geocoder -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+
+  <!-- font-awesome -->
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" -- />
+
+  <!-- D3 -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+  <!-- css -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="src/css/leaflet.css" />
+  <!-- <link rel="stylesheet" href="src/css/leaflet-sidebar.css" /> -->
+  <link rel="stylesheet" href="src/css/leaflet-sidebar-fixed.css" />
+
+  <style></style>
+</head>
+
+<body>
+  <div id="sidebar" class="sidebar collapsed">
+    <!-- Nav tabs -->
+    <div class="sidebar-tabs">
+      <ul role="tablist">
+        <li>
+          <a href="#home" role="tab"><i class="fa fa-bars"></i></a>
+        </li>
+        <li>
+          <a href="#charts" role="tab"><i class="fa fa-bar-chart-o"></i></a>
+        </li>
+        <!-- <li>
+            <a href="#database" role="tab"><i class="fa fa-database"></i></a>
+          </li> -->
+      </ul>
+
+      <ul role="tablist">
+        <li>
+          <a href="#info" role="tab"><i class="fa fa-info"></i></a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tab panes -->
+    <div class="sidebar-content">
+      <div class="sidebar-pane" id="home">
+        <h1 class="sidebar-header">
+          2024 AFFH Mapping Tool
+          <!-- <span class="sidebar-close"><i class="fa fa-caret-left"></i></span> -->
+        </h1>
+
+        <!-- <div class="sidebar-head">
+          <img src="image/CTCAC-logo.png" alt="logo" style="width:10%"/>
+          <img src="image/hcd-logo.png" alt="logo" style="width: 10%">
+          <h3>2024 AFFH Mapping Tool</h3>
+        </div> -->
+
+        <p class="panel-text">
+          <br>
+          <b>The Affirmatively Furthering Fair Housing (AFFH) Mapping Tool is designed to assist in advancing multiple
+            AFFH objectives. The purpose of each of the three mapping tool
+            layers is described below.</b>
+        </p>
+
+        <p class="panel-text">
+          <i><b>Neighborhood Opportunity:</b></i> The Neighborhood Opportunity layer
+          identifies areas in every region of the state whose characteristics
+          have been shown by research to be associated with positive economic,
+          educational, and health outcomes for low-income
+          families—particularly long-term outcomes for children. As such, the
+          layer is intended to inform efforts to advance the AFFH objective of
+          increasing access to opportunity.
+        </p>
+
+        <div class="neat-line"></div>
+
+        <p class="panel-text">
+          <i><b>High-Poverty & Segregated:</b></i> The High-Poverty & Segregated
+          layer identifies areas that meet standards for both high or
+          “concentrated” poverty rates and racial segregation. The use of this
+          layer is grounded in two guiding AFFH objectives: to avoid further
+          segregation and poverty concentration, and to increase access to
+          opportunity.
+        </p>
+
+        <div class="neat-line"></div>
+
+        <p class="panel-text">
+          <i><b>Neighborhood Change:</b></i> The Neighborhood Change Map identifies places 
+          where demographic change presents both challenges and opportunities for advancing 
+          several AFFH objectives, including advancing racial and economic integration and 
+          addressing disproportionate housing needs. The map captures both substantial 
+          racial/ethnic demographic change (growth in the non-Hispanic white share of the population) 
+          and economic demographic change (growth in the share of high-income households), as well 
+          as markers of disproportionate housing needs (rising median rents and the home value/income 
+          percentile gap).
+        </p>
+
+        
+
+      </div>
+
+      <!-- begin charts panel -->
+      <div class="sidebar-pane" id="charts">
+        <h1 class="sidebar-header">
+          2024 AFFH Mapping Tool
+          <!-- <span class="sidebar-close"><i class="fa fa-caret-left"></i></span> -->
+        </h1>
+
+        <!-- add top-most level elements -->
+        <div id='geocoder' class='geocoder'></div>
+        <hr style="height:50px; visibility:hidden;" />
+        <div id="top-level" class="panel-text"></div>
+        <div id="excluded" class="excluded"></div>
+
+        <!-- Opportunity -->
+        <hr style="visibility:hidden;" />
+        <details>
+          <summary>Neighborhood Opportunity</summary>
+
+          <!-- additional info tooltip -->
+          <div class="tooltip">
+            <i class="fa fa-question-circle-o"></i>
+            <span class="tooltiptext">Each indicator value that falls above the regional median adds one point to the
+              overall opportunity score. To account for areas with high levels of environmental burden, one point is
+              deducted if a tract ranks in the highest 5% of regional environmental burden. Using this method, the final
+              scores are divided into four primary categories:
+              <br />
+              <br />● 9 or 8 = “Highest Resource” <br />● 7 or 6 = “High
+              Resource” <br />● 5 or 4 = “Moderate Resource” <br />● 3 or
+              lower = “Low Resource”<br>
+              <br />See the
+              <a class="link-color"
+                href="https://www.treasurer.ca.gov/ctcac/opportunity/2024/draft-2024-opportunity-mapping-methodology.pdf"
+                target="_blank">methodology</a> document for more details.
+            </span>
+          </div>
+
+          <!-- top-level opportunity -->
+          <div id="top-level-opp" class="panel-text"></div>
+
+          <!-- economic chart title -->
+          <div class="chart-titles">
+            <span><br>Economic</span>
+          </div>
+
+          <!-- econ1 chart -->
+          <div id="econ1-container">
+              <canvas id="econ1Canv" width="325" height="103"></canvas>
+          </div>
+
+          <!-- econ2 chart -->
+          <div id="econ2-container">
+            <canvas id="econ2Canv" width="325" height="65"></canvas>
+          </div>
+
+          <!-- education chart title -->
+          <div class="chart-titles">
+            <span>Education</span>
+          </div>
+          <div id="edu-container">
+            <canvas id="eduCanv" width="325" height="130"></canvas>
+          </div>
+
+
+          <!-- environment -->
+          <div class="chart-titles">
+            <span>Environment</span>
+          </div>
+
+          <div class="tooltip">
+            <i class="fa fa-question-circle-o"></i>
+            <span class="tooltiptext">The Environmental Burden Flag represents a subset of data from the CalEnviroScreen
+              4.0 tool and is utilized to identify the geographies that have the highest potential – defined as ranking
+              in the highest 5% of regional environmental burden - to expose vulnerable populations to nearby health and
+              safety threats. See the
+              <a class="link-color"
+                href="https://www.treasurer.ca.gov/ctcac/opportunity/2024/draft-2024-opportunity-mapping-methodology.pdf"
+                target="_blank">methodology document</a> for more details.
+            </span>
+          </div>
+
+          <div class="flag-container">
+            <span>Environmental burden flag:</span>
+            <span class="env-boxes"></span>
+              <span id="env-yes-box" class="yes-box">Yes</span>
+              <span id="env-no-box" class="no-box">No</span>
+              <span id="env-na-box" class="na-box">N/A</span>
+            </span>
+          </div>
+
+          <div class="chart-legend">
+             <b>Neighborhood Opportunity Key:</b>
+          </div>
+          <div class="chart-legend">
+            <span class="key-box reg-leg"></span>Regional median threshold for opportunity indicators
+          </div>
+
+          <div class="neat-line"></div>
+        </details>
+
+        <!-- High-Poverty and Segregated -->
+        <details>
+          <summary>High-Poverty & Segregated</summary>
+
+          <!-- addional info tooltip -->
+          <div class="tooltip">
+            <i class="fa fa-question-circle-o"></i>
+            <span class="tooltiptext">The High-Poverty & Segregated layer identifies areas that meet standards for both
+              concentrated poverty (defined as 30% of the population below the federal poverty line) and racial
+              segregation (overrepresentation of Black, Hispanic, Asian, or all people of color relative to the county).
+              Due to data unreliability at the block group level in the poverty indicator, “High-Poverty and Segregated”
+              is designated at the tract level in rural areas. See the
+              <a class="link-color"
+                href="https://www.treasurer.ca.gov/ctcac/opportunity/2024/draft-2024-opportunity-mapping-methodology.pdf"
+                target="_blank">methodology document</a> for more details.
+            </span>
+          </div>
+
+          <!-- top-level hps -->
+          <div id="top-level-hps" class="panel-text"></div>
+
+          <!-- Poverty -->
+          <div class="chart-titles">
+            <span><br>Poverty</span>
+          </div>
+          
+          <div id="pov-container">
+            <canvas id="povCanv" width="325" height="65"></canvas>
+          </div>
+
+
+          <!-- Segregation -->
+
+          <div class="chart-titles">
+            <span><br>Race/Ethnicity</span>
+          </div>
+
+          <div id="seg-container">
+            <canvas id="segCanv" width="325" height="130"></canvas>
+          </div>
+
+          <div class="chart-legend">
+            <b>High-Poverty & Segregated Key:</b>
+          </div>
+          <div class="chart-legend">
+            <span class="key-box reg-leg"></span>Threshold for high-poverty or racial/ethnic segregation
+          </div>
+          <div class="neat-line"></div>
+        </details>
+
+        <!-- Neighborhood Change -->
+        <details>
+          <summary>Neighborhood Change</summary>
+
+          <div class="tooltip">
+            <i class="fa fa-question-circle-o"></i>
+            <span class="tooltiptext">To be eligible for the Neighborhood Change definition, a tract must in the base year have been 
+              low- or moderate-income (LMI) and have a higher share of people of color (POC) than the county. Rural areas are not eligible. 
+              Eligible tracts can meet the definition via either Pathway 1: A census tract that meets criteria for both racial/ethnic change 
+              and economic change between 2000-2021 (Pathway 1A) or between 2013-2021 (Pathway 1B); or Pathway 2: A census tract that is within 
+              ½ mile of a tract that meets Pathway 1A and meets criteria for racial/ethnic change or economic change between 2013-2021, and 
+              meets the criteria for rising rents or the home value/income gap. See the
+              <a class="link-color"
+                href="https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/neighborhood-change-map-methodology.pdf"
+                target="_blank">methodology document </a>for more details.
+            </span>
+          </div>
+
+          <!-- top-level change -->
+          <div id="top-level-change" class="panel-text"></div>
+
+          <!-- path 1a -->
+          <div class="chart-titles">
+            <span>Pathway 1A: Substantial Racial/Ethnic and Economic Change (since 2000)</span>
+          </div>
+
+          <!-- path 1a baseline race -->
+          <div class="flag-container">
+            <span>POC neighborhood in<br>2000 (baseline criteria):</span>
+            <span class="baseline-boxes"></span>
+              <span id="baseline-yes-box-race-1a" class="yes-box">Yes</span>
+              <span id="baseline-no-box-race-1a" class="no-box">No</span>
+              <span id="baseline-na-box-race-1a" class="na-box">N/A</span>
+            </span>
+          </div>
+
+          <!-- path 1a baseline income -->
+          <div class="flag-container">
+            <span>LMI neighborhood in<br>2000 (baseline criteria):</span>
+            <span class="baseline-boxes"></span>
+              <span id="baseline-yes-box-inc-1a" class="yes-box">Yes</span>
+              <span id="baseline-no-box-inc-1a" class="no-box">No</span>
+              <span id="baseline-na-box-inc-1a" class="na-box">N/A</span>
+            </span>
+          </div>
+
+          <!-- path 1a race/income change chart -->
+          <div id="change1-container">
+            <canvas id="change1Canv" width="325" height="110" ></canvas>
+          </div>
+
+          
+          <!-- path 1b -->
+          <div class="chart-titles">
+            <span>Pathway 1B: Substantial Racial/Ethnic and Economic Change (since 2013)</span>
+          </div>
+
+          <!-- path 1b baseline race -->
+          <div class="flag-container">
+            <span>POC neighborhood in<br>2013 (baseline criteria):</span>
+            <span class="baseline-boxes"></span>
+              <span id="baseline-yes-box-race-1b" class="yes-box">Yes</span>
+              <span id="baseline-no-box-race-1b" class="no-box">No</span>
+              <span id="baseline-na-box-race-1b" class="na-box">N/A</span>
+            </span>
+          </div>
+
+          <!-- path 1b baseline income -->
+          <div class="flag-container">
+            <span>LMI neighborhood in<br>2013 (baseline criteria):</span>
+            <span class="baseline-boxes"></span>
+              <span id="baseline-yes-box-inc-1b" class="yes-box">Yes</span>
+              <span id="baseline-no-box-inc-1b" class="no-box">No</span>
+              <span id="baseline-na-box-inc-1b" class="na-box">N/A</span>
+            </span>
+          </div>
+
+          <!-- path 1b race/income change chart -->
+          <div id="change1b-container">
+            <canvas id="change1bCanv" width="325" height="110" ></canvas>
+          </div>
+          
+          <!-- path 2 -->
+          <div class="chart-titles">
+            <span>Pathway 2: Change since 2013 in Proximity to Pathway 1A Tracts</span>
+          </div>
+
+
+          <div class="tooltip">
+            <i class="fa fa-question-circle-o"></i>
+            <span class="tooltiptext">A half-mile
+              buffer is utilized to account for boundary effects of
+              neighborhood change. See the
+              <a class="link-color"
+                href="https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/neighborhood-change-map-methodology.pdf"
+                target="_blank">methodology document</a>
+              for more details.
+            </span>
+          </div>
+
+          <div id="proximity-change" class="panel-text">
+            <span id="proximity-icon"></span>
+          </div>
+
+          <div class="flag-container">
+            <span>Within 1/2-mile of a<br>Pathway 1A tract:</span>
+            <span class="proximity-boxes"></span>
+              <span id="proximity-yes-box" class="yes-box">Yes</span>
+              <span id="proximity-no-box" class="no-box">No</span>
+              <span id="proximity-na-box" class="na-box">N/A</span>
+            </span>
+          </div>
+
+          <!-- path 2 baseline race -->
+          <div class="flag-container">
+            <span>POC neighborhood in<br>2013 (baseline criteria):</span>
+            <span class="baseline-boxes"></span>
+              <span id="baseline-yes-box-race-2" class="yes-box">Yes</span>
+              <span id="baseline-no-box-race-2" class="no-box">No</span>
+              <span id="baseline-na-box-race-2" class="na-box">N/A</span>
+            </span>
+          </div>
+
+          <!-- path 2 baseline income -->
+          <div class="flag-container">
+            <span>LMI neighborhood in<br>2013 (baseline criteria):</span>
+            <span class="baseline-boxes"></span>
+              <span id="baseline-yes-box-inc-2" class="yes-box">Yes</span>
+              <span id="baseline-no-box-inc-2" class="no-box">No</span>
+              <span id="baseline-na-box-inc-2" class="na-box">N/A</span>
+            </span>
+          </div>
+
+
+          <!-- path 2 race/income change chart -->
+          <div id="change2-container">
+            <canvas id="change2Canv" width="325" height="110"></canvas>
+          </div>
+
+          <!-- path 2 rent change/gap chart -->
+          <div id="change3-container">
+            <canvas id="change3Canv" width="325" height="110"></canvas>
+          </div>
+
+
+          <div class="chart-legend">
+            <b>Neighborhood Change Key:</b>
+          </div>
+          <div class="chart-legend">
+            <span class="key-box reg-leg"></span>County Threshold for Neighborhood
+            Change
+          </div>
+        </details>
+      </div>
+
+      <!-- additonal info -->
+      <div class="sidebar-pane" id="info">
+        <h1 class="sidebar-header">
+          Additional Information
+          <!-- <span class="sidebar-close"><i class="fa fa-caret-left"></i></span> -->
+        </h1>
+
+        <p class="panel-text">
+          <b>Neighborhood Opportunity: </b>
+          <a target="_blank"
+            href="https://www.treasurer.ca.gov/ctcac/opportunity/2024/draft-2024-opportunity-mapping-methodology.pdf"
+            style="color: #525252;"><b>Methodology</b></style></a> <b>|</b>
+          
+          <a target="_blank" href="https://www.treasurer.ca.gov/ctcac/opportunity/2024/frequently-asked-questions.pdf"
+            style="color: #525252;"><b>FAQ</b></style></a>
+          <br />
+          <br />
+          <b>Neighborhood Change: </b>
+          <a target="_blank"
+            href="https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/neighborhood-change-map-methodology.pdf"
+            style="color: #525252;"><b>Methodology</b></a> <b>|</b>
+          
+          <a target="_blank"
+            href="https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/neighborhood-change-map-faqs.pdf"
+            style="color: #525252;"><b>FAQ</b></a>
+          <br />
+          <br />
+          <!-- <a href="mailto: equity_metrics_program@berkeley.edu" style="color: black; text-decoration: none;"><b>Contact</b></a> -->
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- layer toggle -->
+  <nav id="menu" class="menu"></nav>
+  <div id="map" class="sidebar-map"></div>
+
+<!-- map legends -->
+<div class='opp-legend'>
+  <div class='legend-scale'>
+    <ul class='legend-labels'>
+      <li><span style='background:#234EA0;'></span>Highest Resource</li>
+      <li><span style='background:#2897BF;'></span>High Resource</li>
+      <li><span style='background:#73C9BD;'></span>Moderate Resource</li>
+      <li><span style='background:#D5EEB3;'></span>Low Resource</li>
+      <li><span style='background:#bdbdbd;'></span>Insufficient data</li>
+    </ul>
+  </div>
+  </div>
+
+  <div class='hps-legend'>
+    <div class='legend-scale'>
+      <ul class='legend-labels'>
+        <li><img src="image/hps-legend.png"></span>High-Poverty & Segregated</li>
+      </ul>
+    </div>
+    </div>
+
+    <div class='change-legend'>
+    <div class='legend-scale'>
+      <ul class='legend-labels'>
+        <li><img src="image/change-legend.png"></span>Neighborhood Change</li>
+      </ul>
+    </div>
+    </div>
+  
+
+  <!-- leaflet -->
+  <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+  <!-- j-query -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <!-- sidebar -->
+  <script src="src/js/leaflet-sidebar.js"></script>
+  <!-- chart js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+
+  <!-- load js scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/chart-options.js"></script>
+  <script src="js/string-functions.js"></script>
+  <script src="js/map.js"></script>
+
+</body>
+
+</html>
