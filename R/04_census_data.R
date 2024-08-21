@@ -37,6 +37,11 @@
 #'   `Sys.getenv("CENSUS_KEY")` \cr
 #'   `tidycensus::census_api_key('YOURKEYHERE', overwrite = TRUE, install = TRUE)` \cr
 #'
+#' @note
+#' school_distances depends on all_census_data.  The 2023 handle is included in order
+#' to run 2023 school_distances at 2020 geos, required to implement 3-year rolling averages
+#' of education data in the 2025 map.
+#'
 
 #' @export
 all_census_data <- function(year = current_year, geo = 'tract', write = FALSE, read = !write){
@@ -125,7 +130,12 @@ read_census_data <- function(year = current_year, geo = 'tract'){
 #' @rdname all_census_data
 read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = FALSE, test_name=''){
 
-  acs_year <- year-3
+  # 2023 map reverts to 2019 ACS
+  if(year == 2023){
+    acs_year <- year-4
+  } else {
+    acs_year <- year-3
+  }
 
   moe_level <- 90
   verify_geo(geo)
@@ -142,7 +152,7 @@ read_acs_data <- function(year = current_year, geo = 'tract', testing_handle = F
     #return csv containing acs outcome codes and variable names
     var_list <- read_zip(acs_variables, year,
                     col_names = FALSE, col_types = readr::cols())
-    all_acs_vars <- as.data.frame(tidycensus::load_variables(acs_year,'acs1')) #SSN (9/27): is this the right ACS configuration we need?
+    all_acs_vars <- as.data.frame(tidycensus::load_variables(acs_year,'acs5'))
     var_list <- merge(var_list,all_acs_vars,by.x='X1',by.y='name',all.x=TRUE)
     var_list <- as.data.frame(var_list %>% rename(code = X1,name_in_code=X2))
 
