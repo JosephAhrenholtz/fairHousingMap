@@ -7,12 +7,14 @@
 #' `final_opp` creates the final opportunity scores and designations.  `final_raw` and `final_prepare` are both
 #' inputs into `final_opp`.  Only `final_opp` is necessary to run for generating new data.
 #'
+#' @note
+#' 2025 implements a 3-year rolling average of education indicators.  The change is enacted in the final_raw function.
+#'
 #'
 #' @param year designates the map year's filepaths
 #' @param geo allows for opportunity to be assessed at the tract level in urban areas and block group in rural areas
 #' @param write write the final output
-#' @param output `reduced` returns only variables necessary for the map.  If `full`, return all intermediate variables.
-#' @param as_geo logical to return sf object
+#' @param output `reduced` returns only variables necessary for the map.  If `full`, include all intermediate variables.
 #' @param cog logical to write COG referenced shapefile for HCD AFFH Data Viewer.  Is tract-only.  Counties within COG are COG-referenced.  Counties outside of COGS are county-referenced.
 #'
 #'
@@ -25,10 +27,11 @@
 #'
 #' @import dplyr
 #' @import sf
+#' @import rlang
 #'
 #'
 #' @export
-final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo = FALSE, cog  = FALSE){
+final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, cog  = FALSE){
 
   if(cog==FALSE){
     # load tracts and bgs separately for standard scoring
@@ -56,49 +59,57 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
     )
 
 
+  # store indicator cols in a vector
+  econ_cols <- c('pct_above_200_pov', 'home_value', 'pct_bachelors_plus', 'pct_employed')
+  ed_cols <- c('math_prof', 'read_prof', 'grad_rate', 'pct_not_frpm')
+  ind_cols <- c(econ_cols, ed_cols)
 
-  # assign above/below regional median for economic/educational indicators
+  # create regional median scores and values
   final <- final %>%
     group_by(regionid) %>%
-    # scores
-    mutate_at(vars(pct_above_200_pov:pct_not_frpm), list(score = function(x) ifelse(x >= median(x, na.rm = TRUE), 1, 0))) %>%
-    # regional median values for interface charts
-    mutate_at(vars(pct_above_200_pov:pct_not_frpm), list(median = median), na.rm = T) %>%
+    # create above/below median scores
+    mutate_at(vars(!!!syms(ind_cols)), list(score = function(x) ifelse(x >= median(x, na.rm = TRUE), 1, 0))) %>%
+    # save regional median values for charts
+    mutate_at(vars(!!!syms(ind_cols)), list(median = median), na.rm = TRUE) %>%
     ungroup()
 
 
-  # remove scores with less than 2 obs
+  # store score cols in a vector
+  score_cols <- c('pct_above_200_pov_score', 'home_value_score', 'pct_bachelors_plus_score',
+                  'pct_employed_score', 'math_prof_score', 'read_prof_score',
+                  'grad_rate_score', 'pct_not_frpm_score')
+
+  # make indicator scores null where there are less than 2 obs within the reference region
   final <- final %>%
     group_by(regionid) %>%
-    mutate_at(vars(pct_above_200_pov_score:pct_not_frpm_score), function(x) case_when(sum(!is.na(x)) < 2 ~ NA_real_, TRUE ~ x)) %>%
+    mutate_at(vars(!!!syms(score_cols)), function(x) case_when(sum(!is.na(x)) < 2 ~ NA_real_, TRUE ~ x)) %>%
     ungroup()
 
-  # invalidate medians with less than 2 obs
+  # count the number of non-null values for each indicator within the refernce region
   final <- final %>%
     group_by(regionid) %>%
-    mutate_at(vars(pct_above_200_pov:pct_not_frpm), list(valid = function(x) sum(!is.na(x)))) %>%
+    mutate_at(vars(!!!syms(ind_cols)), list(valid = function(x) sum(!is.na(x)))) %>%
     ungroup()
 
-  final$pct_above_200_pov_median[which(final$pct_above_200_pov_valid < 2)] <- NA
-  final$home_value_median[which(final$home_value_valid < 2)] <- NA
-  final$pct_bachelors_plus_median[which(final$pct_bachelors_plus_valid < 2)] <- NA
-  final$pct_employed_median[which(final$pct_employed_valid < 2)] <- NA
-  final$math_prof_median[which(final$math_prof_valid < 2)] <- NA
-  final$read_prof_median[which(final$read_prof_valid < 2)] <- NA
-  final$grad_rate_median[which(final$grad_rate_valid < 2)] <- NA
-  final$pct_not_frpm_median[which(final$pct_not_frpm_valid < 2)] <- NA
+
+  # loop through ind cols and invalidate medians with less than 2 valid observations
+  for (col in ind_cols) {
+    median_col <- paste0(col, "_median")
+    valid_col <- paste0(col, "_valid")
+    final[[median_col]][which(final[[valid_col]] < 2)] <- NA
+  }
 
 
-  # calculate total non-null values for each geography
+  # calculate total non-null indicator scores for each tract/bg
   final <- final %>%
     mutate(total_valid = rowSums(
-      transmute_at(., vars(pct_above_200_pov_score:pct_not_frpm_score, env_site_score),
+      transmute_at(., vars(!!!syms(score_cols), env_site_score),
                    function(x) ifelse(!is.na(x), 1, 0))))
 
 
-  # calculate positively oriented score
+  # calculate opportunity score
   final <- final %>%
-    mutate(oppscore = rowSums(select(., pct_above_200_pov_score:pct_not_frpm_score, env_site_score), na.rm = TRUE),
+    mutate(oppscore = rowSums(select(., all_of(score_cols), env_site_score), na.rm = TRUE),
            # invalidate scores with more than 2 missing values
            oppscore = ifelse(total_valid >= 7, oppscore, NA))
 
@@ -122,7 +133,6 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
                military_flag == 1 ~ 1,
                TRUE ~ 0
              ))
-
 
 
 
@@ -179,20 +189,9 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
     final <- final %>% left_join(change, by = 'fips')
 
     # save cols for selection
-    opp_cols <- c('pct_above_200_pov',
-                          'pct_bachelors_plus',
-                          'pct_employed',
-                          'home_value',
-                          'math_prof',
-                          'read_prof',
-                          'grad_rate',
-                          'pct_not_frpm',
-                          'env_site_score',
-                          'pct_below_pov',
-                          'pct_asian',
-                          'pct_black',
-                          'pct_hispanic',
-                          'pct_poc')
+    dem_cols <- c('pct_below_pov', 'pct_asian', 'pct_black',
+                  'pct_hispanic', 'pct_poc')
+    opp_cols <- c(ind_cols, 'env_site_score', dem_cols)
     change_cols <- colnames(change[, !names(change) %in% c("fips")])
     chart_cols <- c(opp_cols, change_cols)
 
@@ -203,15 +202,18 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
                           funs(ifelse(exclude_flag == 1 | county_name == 'Alpine', NA, .)))
 
 
-    # return reduced is false return the full data frame with geo
+
+    # attach geometries
+    urban <- final %>% filter(is.na(fips_bg))
+    rural <- final %>% filter(!is.na(fips_bg))
+
+    urban_geo <- urban %>% left_join(shape_CA_tract, by = c('fips', 'county_name')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
+    rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
+    final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
+
+
+    # if reduced is false return the full data frame with geos
     if(reduced == FALSE){
-      urban <- final %>% filter(is.na(fips_bg))
-      rural <- final %>% filter(!is.na(fips_bg))
-
-      urban_geo <- urban %>% left_join(shape_CA_tract, by = c('fips', 'county_name')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
-      rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
-      final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
-
       if(write == TRUE){
         # remove the geojson file if it exists
         file_name <- paste0("output/", year, "/final_full_", year, '.geojson')
@@ -219,63 +221,48 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
           file.remove(file_name)
         }
         sf::st_write(final_geo, file_name)
+      }else{
+        return(final_geo)
       }
 
     # otherwise reduce to vars necessary for mapping interface
     } else {
-      final <- final %>%
+      final_geo <- final_geo %>%
         select(
           # geo
           starts_with('fips'), region, regionid, county_name,
           # basic population
           total_pop,
           pop_density,
-          density_flag,
-          military_flag,
-          prison_flag,
-          exclude_flag,
-          college_flag, # only used to exclude nc
+          ends_with('flag'),
           # opp indicators
-          pct_above_200_pov:pct_not_frpm, ends_with('median'), contains('score'), total_valid,
+          ind_cols,
+          ends_with('median'),
+          contains('score'),
+          total_valid,
           # pov and seg indicators
-          pct_below_pov, high_pov_thresh, starts_with('lq_'),
-          pct_asian, pct_black, pct_hispanic, pct_poc,
-          asian_seg_thresh, black_seg_thresh, hispanic_seg_thresh, poc_seg_thresh,
-          # score/designations
-          oppscore, oppcat, pov_seg_flag,
+          dem_cols, high_pov_thresh, starts_with('lq_'), ends_with('seg_thresh'),
+          # designations
+          oppcat, pov_seg_flag,
           # neighborhood change
           all_of(change_cols))
 
       # limit digits to 4 to minimize file size
-      final <- final %>% mutate_if(is.numeric,
+      final_geo <- final_geo %>% mutate_if(is.numeric,
                                    round,
                                    digits = 4)
 
-      # write final spatial data
-      if(as_geo == TRUE){
-        urban <- final %>% filter(is.na(fips_bg))
-        rural <- final %>% filter(!is.na(fips_bg))
-
-        urban_geo <- urban %>% left_join(shape_CA_tract, by = c('fips', 'county_name')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
-        rural_geo <- rural %>% left_join(shape_CA_bg, by = c('fips_bg')) %>% sf::st_as_sf() %>% sf::st_set_crs(4326)
-        final_geo <- dplyr::bind_rows(urban_geo, rural_geo)
-
-        if(write == TRUE){
-          # remove the geojson file if it exists
-          file_name <- paste0("output/", year, "/final_", year, '.geojson')
-          if(file.exists(file_name)){
-            file.remove(file_name)
-          }
-          sf::st_write(final_geo, file_name)
+      if(write == TRUE){
+        # remove the geojson file if it exists
+        file_name <- paste0("output/", year, "/final_", year, '.geojson')
+        if(file.exists(file_name)){
+          file.remove(file_name)
         }
+        sf::st_write(final_geo, file_name)
+      }else{
         return(final_geo)
       }
     }
-
-    #write final non-spatial data
-    if(write)readr::write_csv(final, paste0("output/", year, "/final_", year, '.csv'))
-    return(final)
-
   }
 }
 
@@ -283,12 +270,39 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, as_geo
 # everything below this line is an input to the final_opp function
 #' @export
 #' @rdname final_opp
-final_raw <- function(year = current_year, geo = 'tract', write = FALSE, testing_handle=FALSE){
+final_raw <- function(year = current_year, geo = 'tract'){
 
-  # read data from previously generated files
-  education_indicators <- school_distances(year = year, geo = geo)
+  # read intermediate files
   acs_census <- all_census_data(year = year, geo = geo)
   ces <- xwalk_ces(year = year)
+
+  # use 3-year rolling education averages starting in 2025
+  if (year >= 2025){
+    # load education measures over last 3 years
+    ed_inds <- school_distances(year = year, geo = geo)
+    ed_inds_yr_minus_1 <- school_distances(year = year-1, geo = geo)
+    ed_inds_yr_minus_2 <- school_distances(year = year-2, geo = geo)
+
+    # calculate the 3-year average
+    average_read_prof <- rowMeans(cbind(ed_inds$read_prof, ed_inds_yr_minus_1$read_prof, ed_inds_yr_minus_2$read_prof), na.rm = TRUE)
+    average_math_prof <- rowMeans(cbind(ed_inds$math_prof, ed_inds_yr_minus_1$math_prof, ed_inds_yr_minus_2$math_prof), na.rm = TRUE)
+    average_grad_rate <- rowMeans(cbind(ed_inds$grad_rate, ed_inds_yr_minus_1$grad_rate, ed_inds_yr_minus_2$grad_rate), na.rm = TRUE)
+    average_pct_not_frpm <- rowMeans(cbind(ed_inds$pct_not_frpm, ed_inds_yr_minus_1$pct_not_frpm, ed_inds_yr_minus_2$pct_not_frpm), na.rm = TRUE)
+
+    fips_col <- ed_inds[1]
+
+    # create a new dataframe of the 3-year education averages
+    education_indicators <- data.frame(
+      fips_col,
+      read_prof = average_read_prof,
+      math_prof = average_math_prof,
+      grad_rate = average_grad_rate,
+      pct_not_frpm = average_pct_not_frpm
+    )
+  # otherwise use single year for education measures
+  } else {
+    education_indicators <- school_distances(year = year, geo = geo)
+  }
 
 
   #join all data
@@ -298,9 +312,6 @@ final_raw <- function(year = current_year, geo = 'tract', write = FALSE, testing
 
   })
 
-  if(testing_handle==TRUE){
-    return(rawdata) #without removing year suffixes
-  }
 
   #remove year suffixes from ACS variable names
   acs_year <- year-3
