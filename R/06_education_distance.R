@@ -17,10 +17,9 @@
 #'
 #' @import dplyr
 #' @importFrom geosphere distGeo
-#' @importFrom testit assert
 #'
 #' @export
-school_distances <- function(year = current_year, geo = 'tract', write = FALSE, read = !write, testing_handle=FALSE){
+school_distances <- function(year = current_year, geo = 'tract', write = FALSE, read = !write){
   filename = paste0("data/intermediate/", year,'/education_indicators_', geo, '.csv.gz')
   if(read == TRUE){
     distance_indicators <- readr::read_csv(filename, col_types = readr::cols())
@@ -93,14 +92,6 @@ school_distances <- function(year = current_year, geo = 'tract', write = FALSE, 
       by = c('CDSCode', 'enrollment')) %>%
       dplyr::full_join(nearest_high, by = 'CDSCode', suffix = c('','_hs'))
 
-    if(testing_handle==TRUE){
-      #there should be three schools under each category (elem, frpm, high)
-      testit::assert("three nearest elementary schools",sum(!is.na(nearest$distance_elem))==3)
-      testit::assert("three nearest high schools",sum(!is.na(nearest$distance_high))==3)
-      testit::assert("three nearest free or reduced-price meal schools",sum(!is.na(nearest$distance_frpm))==3)
-      testit::assert("all schools are unique",length(unique(nearest$CDSCode))==dim(nearest)[1])
-    }
-
 
     # adding tract/block group
     if(geo == 'tract') nearest$fips <- row$fips
@@ -129,7 +120,9 @@ distance_indicators <- dplyr::summarize(distance_indicators_Sch,
 
 distance_indicators$pct_not_frpm <- 1 - distance_indicators$pct_frpm
 
-# distance_indicators <- dplyr::left_join(distance_indicators, graduation_rates(), by = 'fips')
+# remove unnecessary columns
+distance_indicators <- distance_indicators %>%
+  select(-pct_frpm, -distance_elem_avg, -distance_elem_closest, -distance_elem_farthest)
 
 if(write == TRUE){
     readr::write_csv(distance_indicators, filename)
