@@ -30,7 +30,7 @@ map.on('load', () => {
     // add geojson source data
     map.addSource('data', {
         'type': 'geojson',
-        'data': 'data/final_2024.geojson',
+        'data': 'data/final_2025.geojson',
         'generateId': true
     });
     map.addSource('counties', {
@@ -254,15 +254,15 @@ map.on('load', () => {
                 );
 
         // pass baseline change results to sidebar
-        baseline1aBoxRace(properties.baseline_race0021)
-        baseline1aBoxInc(properties.baseline_income0021)
+        baseline1aBoxRace(properties.baseline_race0022)
+        baseline1aBoxInc(properties.baseline_income0022)
 
-        baseline1bBoxRace(properties.baseline_race1321)
-        baseline1bBoxInc(properties.baseline_income1321)
+        baseline1bBoxRace(properties.baseline_race1322)
+        baseline1bBoxInc(properties.baseline_income1322)
 
         proximityBox(properties.halfmile_buffer);
-        baseline2BoxRace(properties.baseline_race1321);
-        baseline2BoxInc(properties.baseline_income1321);
+        baseline2BoxRace(properties.baseline_race1322);
+        baseline2BoxInc(properties.baseline_income1322);
 
         // build charts
         function getCharts(d, options, canvas) {

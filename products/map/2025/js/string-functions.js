@@ -186,7 +186,7 @@ function changeString(path_1a, path_1b, path_2, region, exclude_flag, college_fl
 
 
 // Pathway 1A baseline - race
-function baseline1aBoxRace(baseline_race0021) {
+function baseline1aBoxRace(baseline_race0022) {
   // set path to elements
   let yesBox = document.getElementById("baseline-yes-box-race-1a");
   let noBox = document.getElementById("baseline-no-box-race-1a");
@@ -198,9 +198,9 @@ function baseline1aBoxRace(baseline_race0021) {
   naBox.setAttribute("class", "na-box");
 
   // conditionally replace class
-  if (baseline_race0021 == 1) {
+  if (baseline_race0022 == 1) {
     yesBox.classList.replace('yes-box', 'change-yes-box');
-  } else if (baseline_race0021 == 0) {
+  } else if (baseline_race0022 == 0) {
     noBox.classList.replace('no-box', 'change-no-box');
   } else {
     naBox.classList.replace('na-box', 'na-box-flag');
@@ -208,7 +208,7 @@ function baseline1aBoxRace(baseline_race0021) {
 }
 
 // Pathway 1A baseline - income
-function baseline1aBoxInc(baseline_income0021) {
+function baseline1aBoxInc(baseline_income0022) {
   // set path to elements
   let yesBox = document.getElementById("baseline-yes-box-inc-1a");
   let noBox = document.getElementById("baseline-no-box-inc-1a");
@@ -220,9 +220,9 @@ function baseline1aBoxInc(baseline_income0021) {
   naBox.setAttribute("class", "na-box");
 
   // conditionally replace class
-  if (baseline_income0021 == 1) {
+  if (baseline_income0022 == 1) {
     yesBox.classList.replace('yes-box', 'change-yes-box');
-  } else if (baseline_income0021 == 0) {
+  } else if (baseline_income0022 == 0) {
     noBox.classList.replace('no-box', 'change-no-box');
   } else {
     naBox.classList.replace('na-box', 'na-box-flag');
@@ -230,7 +230,7 @@ function baseline1aBoxInc(baseline_income0021) {
 }
 
 // Pathway 1B baseline - race
-function baseline1bBoxRace(baseline_race1321) {
+function baseline1bBoxRace(baseline_race1322) {
   // set path to elements
   let yesBox = document.getElementById("baseline-yes-box-race-1b");
   let noBox = document.getElementById("baseline-no-box-race-1b");
@@ -242,9 +242,9 @@ function baseline1bBoxRace(baseline_race1321) {
   naBox.setAttribute("class", "na-box");
 
   // conditionally replace class
-  if (baseline_race1321 == 1) {
+  if (baseline_race1322 == 1) {
     yesBox.classList.replace('yes-box', 'change-yes-box');
-  } else if (baseline_race1321 == 0) {
+  } else if (baseline_race1322 == 0) {
     noBox.classList.replace('no-box', 'change-no-box');
   } else {
     naBox.classList.replace('na-box', 'na-box-flag');
@@ -252,7 +252,7 @@ function baseline1bBoxRace(baseline_race1321) {
 }
 
 // Pathway 1B baseline - income
-function baseline1bBoxInc(baseline_income1321) {
+function baseline1bBoxInc(baseline_income1322) {
   // set path to elements
   let yesBox = document.getElementById("baseline-yes-box-inc-1b");
   let noBox = document.getElementById("baseline-no-box-inc-1b");
@@ -264,9 +264,9 @@ function baseline1bBoxInc(baseline_income1321) {
   naBox.setAttribute("class", "na-box");
 
   // conditionally replace class
-  if (baseline_income1321 == 1) {
+  if (baseline_income1322 == 1) {
     yesBox.classList.replace('yes-box', 'change-yes-box');
-  } else if (baseline_income1321 == 0) {
+  } else if (baseline_income1322 == 0) {
     noBox.classList.replace('no-box', 'change-no-box');
   } else {
     naBox.classList.replace('na-box', 'na-box-flag');
@@ -296,7 +296,7 @@ function proximityBox(halfmile_buffer) {
 }
 
 // Race seperate for Pathway 2 
-function baseline2BoxRace(baseline_race1321) {
+function baseline2BoxRace(baseline_race1322) {
   // set path to elements
   let yesBox = document.getElementById("baseline-yes-box-race-2");
   let noBox = document.getElementById("baseline-no-box-race-2");
@@ -308,9 +308,9 @@ function baseline2BoxRace(baseline_race1321) {
   naBox.setAttribute("class", "na-box");
 
   // conditionally replace class
-  if (baseline_race1321 == 1) {
+  if (baseline_race1322 == 1) {
     yesBox.classList.replace('yes-box', 'change-yes-box');
-  } else if (baseline_race1321 == 0) {
+  } else if (baseline_race1322 == 0) {
     noBox.classList.replace('no-box', 'change-no-box');
   } else {
     naBox.classList.replace('na-box', 'na-box-flag');
@@ -318,7 +318,7 @@ function baseline2BoxRace(baseline_race1321) {
 }
 
 // Income seperate for Pathway 2
-function baseline2BoxInc(baseline_income1321) {
+function baseline2BoxInc(baseline_income1322) {
   // set path to elements
   let yesBox = document.getElementById("baseline-yes-box-inc-2");
   let noBox = document.getElementById("baseline-no-box-inc-2");
@@ -330,9 +330,9 @@ function baseline2BoxInc(baseline_income1321) {
   naBox.setAttribute("class", "na-box");
 
   // conditionally replace class
-  if (baseline_income1321 == 1) {
+  if (baseline_income1322 == 1) {
     yesBox.classList.replace('yes-box', 'change-yes-box');
-  } else if (baseline_income1321 == 0) {
+  } else if (baseline_income1322 == 0) {
     noBox.classList.replace('no-box', 'change-no-box');
   } else {
     naBox.classList.replace('na-box', 'na-box-flag');
