@@ -22,55 +22,32 @@ read_neighborhood_change <- function(year = current_year){
   filepaths(year=year)
   change_all <- read_csv(nc_scores)
 
-  change_cols <- c(
-    # pathway 1A
-    #'baseline_raceinc0021',
-    'baseline_race0021',
-    'baseline_income0021',
-    'trct_raceeth_chng0021',
-    'raceeth_half0021',
-    'trct_inc_chng0021',
-    'inc_half0021',
-    'part1',
-    # pathway 1B
-    'baseline_race1321',
-    'baseline_income1321',
-    'trct_raceeth_chng1321',
-    'raceeth_quarter1321',
-    'trct_inc_chng1321',
-    'inc_quarter1321',
-    'part3', # change name below
-    # pathway 2
-    'halfmile_buffer',
-    'raceeth_half1321',
-    'inc_half1321',
-    'trct_pctchng_medrent1321',
-    'rent_half1321',
-    'pct_gap',
-    'part2',
-    # nc flag
-    'nbrhood_chng'
-  )
 
   change <- change_all %>%
     dplyr::select('fips' = 'tract2020',
-                  all_of(change_cols), exclusion_flag, rural_flag)
+                  #all_of(change_cols),
+                  starts_with('baseline'),
+                  starts_with('trct_raceeth'),
+                  starts_with('trct_medinc_pctchng'),
+                  starts_with('raceeth'),
+                  starts_with('medinc'),
+                  starts_with('trct_pctchng_medrent'),
+                  starts_with('rent'),
+                  starts_with('pct_gap'),
+                  starts_with('pathway'),
+                  starts_with('nbrhood_chng'),
+                  'nc_exclusion_flag' = exclusion_flag,
+                  rural_flag)
 
   # final prep
   change <- change %>%
     # add flat income gap threshold
     mutate(gap_thresh = .25) %>%
-    # apply NA's
-    mutate_at(vars(append(change_cols, 'gap_thresh')), ~
-                replace(., exclusion_flag == 1, NA)) %>%
-    mutate_at(vars(append(change_cols, 'gap_thresh')), ~
-                replace(., rural_flag == 1, NA)) %>%
-    # rename based on final methodology
-    rename(
-      'path_1a' = part1,
-      'path_1b' = part3,
-      'path_2' = part2,
-      'nc_exclude_flag' = exclusion_flag) %>%
+    # apply null values where exclusion or rural flag is raised
+    mutate_at(
+      vars(select_if(., is.numeric) %>% names() %>% setdiff(c("nc_exclusion_flag", "rural_flag"))),
+      ~ replace(., nc_exclusion_flag == 1 | rural_flag == 1, NA)
+    ) %>%
     # relocate gap field
     relocate(gap_thresh, .after = pct_gap) %>%
     # drop rural flag
