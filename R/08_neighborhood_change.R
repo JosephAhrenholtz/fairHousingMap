@@ -31,6 +31,7 @@ read_neighborhood_change <- function(year = current_year){
                   starts_with('trct_medinc_pctchng'),
                   starts_with('raceeth'),
                   starts_with('medinc'),
+                  halfmile_buffer,
                   starts_with('trct_pctchng_medrent'),
                   starts_with('rent'),
                   starts_with('pct_gap'),

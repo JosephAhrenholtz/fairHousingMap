@@ -21,7 +21,8 @@
 final_opp_public <- function(year = current_year, write = FALSE, change = FALSE){
 
   final <- final_opp(year,  reduced = F)
-  geo <- final_opp(year, as_geo = T) %>% select(fips, fips_bg, geometry)
+  geo <- final %>% select(fips, fips_bg, geometry)
+  final <- final %>% st_drop_geometry() %>% as.data.frame()
 
   # flip env site score to burden flag
   final$env_burden_flag <- ifelse(final$env_site_score == 1, 0, 1)
@@ -85,7 +86,7 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
   name <- public_columns
   opp_dict <- data.frame(name, description)
 
-  final_public <- dplyr::select(final, public_columns)
+  final_public <- dplyr::select(final, all_of(public_columns))
 
 
   # write file to csv and excel
@@ -160,12 +161,33 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
 
     hs <- openxlsx::createStyle(textDecoration = "BOLD", fontColour = "#FFFFFF", fontSize=12,
                                 fgFill = "#969696")
-    for(i in 1:length(sheets)){
+
+
+    for(i in 1:length(sheets)) {
+      sheet_data <- sheets[[i]]
+
+      # enusre sheet data is a data frame
+      if (!is.data.frame(sheet_data)) {
+        stop(paste("Sheet", names(sheets)[i], "is not a data frame"))
+      }
+
+      # check for any list columns and convert them to character
+      for (col in names(sheet_data)) {
+        if (is.list(sheet_data[[col]])) {
+          sheet_data[[col]] <- sapply(sheet_data[[col]], as.character)
+        }
+      }
+
+      # add worksheet and write data
       openxlsx::addWorksheet(wb, names(sheets)[i])
-      openxlsx::writeData(wb, sheet = i, sheets[[i]], keepNA = TRUE)
+      openxlsx::writeData(wb, sheet = i, sheet_data, keepNA = TRUE)
       openxlsx::addStyle(wb, sheet = i, hs, rows = 1, cols = 1:ncols)
-      if(i==1)  openxlsx::setColWidths(wb, sheet = i, cols = 1:ncols, widths = colwidths)
-      else openxlsx::setColWidths(wb, sheet = i, cols = 1:(ncols-1), widths = colwidths[-region_col])
+
+      if(i == 1) {
+        openxlsx::setColWidths(wb, sheet = i, cols = 1:ncols, widths = colwidths)
+      } else {
+        openxlsx::setColWidths(wb, sheet = i, cols = 1:(ncols-1), widths = colwidths[-region_col])
+      }
     }
 
     # write opportunity summary files
@@ -184,38 +206,38 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
 
                           # pathway 1a
                           #"baseline_raceinc0021",
-                          "baseline_race0021",
-                          "baseline_income0021",
-                          "trct_raceeth_chng0021",
-                          "raceeth_half0021",
-                          "trct_inc_chng0021",
-                          "inc_half0021",
-                          "path_1a",
+                          "baseline_race0022",
+                          "baseline_income0022",
+                          "trct_raceeth_chng0022",
+                          "raceeth_half0022",
+                          "trct_medinc_pctchng_0022",
+                          "medinc_half0022",
+                          "pathway1a",
 
                           # pathway 1b
-                          "baseline_race1321",
-                          "baseline_income1321",
-                          "trct_raceeth_chng1321",
-                          "raceeth_quarter1321",
-                          "trct_inc_chng1321",
-                          "inc_quarter1321",
-                          "path_1b",
+                          "baseline_race1322",
+                          "baseline_income1322",
+                          "trct_raceeth_chng1322",
+                          "raceeth_quarter1322",
+                          "trct_medinc_pctchng_1322",
+                          "medinc_quarter1322",
+                          "pathway1b",
 
                           # pathway 2
                           "halfmile_buffer",
-                          "raceeth_half1321",
-                          "inc_half1321",
-                          "trct_pctchng_medrent1321",
-                          "rent_half1321",
+                          "raceeth_half1322",
+                          "medinc_half1322",
+                          "trct_pctchng_medrent1322",
+                          "rent_half1322",
                           "pct_gap",
                           "gap_thresh",
-                          "path_2",
+                          "pathway2",
 
                           # nc flag
                           "nbrhood_chng",
 
                           # exclude flag,
-                          "nc_exclude_flag"
+                          "nc_exclusion_flag"
                           )
 
       description <- c(
@@ -226,30 +248,30 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
         #"Binary flag if tract was a LMI and POC neighborhood in 2000",
         "Binary flag if tract was a POC neighborhood in 2000",
         "Binary flag if tract was a LMI neighborhood in 2000",
-        "Percentage point change in tract's non-Hispanic white population (2000-2021)",
-        "Countywide 50% threshold for non-Hispanic white tract-level percentage point increase (2000-2021)",
-        "Percentage point change in tract's above-moderate-income households (2000-2021)",
-        "Countywide 50% threshold for above-moderate-income households tract-level percentage point increase (2000-2021)",
-        "Pathway 1A: Binary flag if a tract meets both racial/ethnic change and economic change between 2000-2021 (50% threshold)",
+        "Percentage point change in tract's non-Hispanic white population (2000-2022)",
+        "Regionwide 50% threshold for non-Hispanic white tract-level percentage point increase (2000-2022)",
+        "Percent change in tract's household median income (2000-2022)",
+        "Regionwide 50% threshold for tract-level median income percentage increase (2000-2022)",
+        "Pathway 1A: Binary flag if a tract meets both racial/ethnic change and economic change between 2000-2022 (50% threshold)",
 
         # pathway 1b
         "Binary flag if tract was a POC neighborhood in 2013",
         "Binary flag if tract was a LMI neighborhood in 2013",
-        "Percentage point change in tract's non-Hispanic white population (2013-2021)",
-        "Countywide 75% threshold for non-Hispanic white tract-level percentage point increase (2013-2021)",
-        "Percentage point change in tract's above-moderate-income households (2013-2021)",
-        "Countywide 75% threshold for above-moderate-income households tract-level percentage point increase (2013-2021)",
-        "Pathway 1B: Binary flag if a tract meets both racial/ethnic change and economic change between 2013-2021",
+        "Percentage point change in tract's non-Hispanic white population (2013-2022)",
+        "Regionwide 75% threshold for non-Hispanic white tract-level percentage point increase (2013-2022)",
+        "Percent change in tract's household median income (2013-2022)",
+        "Regionwide 75% threshold for tract-level median income percentage increase (2013-2022)",
+        "Pathway 1B: Binary flag if a tract meets both racial/ethnic change and economic change (2013-2022)",
 
         # pathway 2
         "Binary flag if a tract's population-weighted centroid is within 1/2-mile of the population-weighted centroid of a tract that meets Pathway 1A",
-        "Countywide 50% threshold for non-Hispanic white tract-level percentage point increase (2013-2021)",
-        "Countywide 50% threshold for above-moderate-income households tract-level percentage point increase (2013-2021)",
-        "Percent change in tract's median rent (2013-2021)",
-        "Countywide 50% threshold for percent change in median rent (2013-2021)",
-        "Difference between the tract's household median income percentile and its median home value percentile (2021)",
+        "Regionwide 50% threshold for non-Hispanic white tract-level percentage point increase (2013-2022)",
+        "Regionwide 50% threshold for tract-level median income percentage increase (2013-2022)",
+        "Percent change in tract's median rent (2013-2022)",
+        "Regionwide 50% threshold for percent change in median rent (2013-2022)",
+        "Difference between the tract's household median income percentile and its median home value percentile (2022)",
         "Flat 25% threshold for home-value/income gap",
-        "Pathway 2: Binary flag if a tract that is within 1/2-mile (population-weighted) of a tract that meets Pathway 1A and has rising rents and/or a home-value/income gap, and experienced either racial/ethnic or economic change (2013-2021)",
+        "Pathway 2: Binary flag if a tract that is within 1/2-mile (population-weighted) of a tract that meets Pathway 1A and has rising rents and/or a home-value/income gap, and experienced either racial/ethnic or economic change (2013-2022)",
 
         # nc flag
         "Binary flag if a tract meets the definition of neighborhood change (Pathway 1A, Pathway 1B, or Pathway 2)",
@@ -276,38 +298,38 @@ final_opp_public <- function(year = current_year, write = FALSE, change = FALSE)
 
                                     # Pathway 1A
                                     #`Binary Flag - Historic POC & LMI neighborhood in 2000 (baseline criteria)` = baseline_raceinc0021,
-                                    `Binary Flag - Binary flag if tract was a POC neighborhood in 2000` = baseline_race0021,
-                                    `Binary Flag - Binary flag if tract was a LMI neighborhood in 2000` = baseline_income0021,
-                                    `2000-2021 Non-Hispanic White Share Change (pp)` = trct_raceeth_chng0021,
-                                    `2000-2021 County 50% Threshold for Non-Hispanic White Share Change (pp)` = raceeth_half0021,
-                                    `2000-2021 High-Income Share Chage (pp)` = trct_inc_chng0021,
-                                    `2000-2021 County 50% Threshold for High-Income Share Chage (pp)` = inc_half0021,
-                                    `Binary Flag - Meets Pathway 1A Definition` = path_1a,
+                                    `Binary Flag - Binary flag if tract was a POC neighborhood in 2000` = baseline_race0022,
+                                    `Binary Flag - Binary flag if tract was a LMI neighborhood in 2000` = baseline_income0022,
+                                    `2000-2022 Non-Hispanic white share change (pp)` = trct_raceeth_chng0022,
+                                    `2000-2022 Region 50% threshold for non-Hispanic white share change (pp)` = raceeth_half0022,
+                                    `2000-2022 Household median income change (%)` = trct_medinc_pctchng_0022,
+                                    `2000-2022 Region 50% threshold for median income change (%)` = medinc_half0022,
+                                    `Binary Flag - Meets Pathway 1A Definition` = pathway1a,
 
                                     # Pathway 1B
-                                    `Binary Flag - Binary flag if tract was a POC neighborhood in 2013` = baseline_race1321,
-                                    `Binary Flag - Binary flag if tract was a LMI neighborhood in 2013` = baseline_income1321,
-                                    `2013-2021 Non-Hispanic White Share Change (pp)` = trct_raceeth_chng1321,
-                                    `2013-2021 County 75% Threshold for Non-Hispanic White Share Change (pp)` = raceeth_quarter1321,
-                                    `2013-2021 High-Income Share Chage (pp)` = trct_inc_chng1321,
-                                    `2013-2021 County 75% Threshold for High-Income Share Chage (pp)` = inc_quarter1321,
-                                    `Binary Flag - Meets Pathway 1B Definition` = path_1b,
+                                    `Binary Flag - Binary flag if tract was a POC neighborhood in 2013` = baseline_race1322,
+                                    `Binary Flag - Binary flag if tract was a LMI neighborhood in 2013` = baseline_income1322,
+                                    `2013-2022 Non-Hispanic white share change (pp)` = trct_raceeth_chng1322,
+                                    `2013-2022 Region 75% threshold for non-Hispanic white share change (pp)` = raceeth_quarter1322,
+                                    `2013-2022 Household median income change (%)` = trct_medinc_pctchng_1322,
+                                    `2013-2022 Region 75% threshold for median income change (%)` = medinc_quarter1322,
+                                    `Binary Flag - Meets Pathway 1B Definition` = pathway1b,
 
                                     # Pathway 2
                                     `Binary Flag - Within 1/2-mile of Pathway 1A tract` = halfmile_buffer,
-                                    `2013-2021 County 50% Threshold for Non-Hispanic White Share Change (pp)` = raceeth_half1321,
-                                    `2013-2021 County 50% Threshold for High-Income Share Chage (pp)` = inc_half1321,
-                                    `2013-2021 Median Rent Change (%)` = trct_pctchng_medrent1321,
-                                    `2013-2021 County 50% Threshold for Median Rent Change (%)` = rent_half1321,
-                                    `2021 Home Value/Income Gap (pp)` = pct_gap,
+                                    `2013-2022 Region 50% threshold for non-Hispanic white share change (pp)` = raceeth_half1322,
+                                    `2013-2022 Region 50% threshold for median income change (%)` = medinc_half1322,
+                                    `2013-2022 Median rent change (%)` = trct_pctchng_medrent1322,
+                                    `2013-2022 Region 50% threshold for median rent change (%)` = rent_half1322,
+                                    `2022 Home value/income gap (pp)` = pct_gap,
                                     `Flat 25% threshold for home-value/income gap` = gap_thresh,
-                                    `Binary Flag - Meets Pathway 2 Definition` = path_2,
+                                    `Binary Flag - Meets Pathway 2 Definition` = pathway2,
 
                                     # nc flag
                                     `Binary Flag - Meets Pathway 1A, Pathway 1B, or Pathway 2 Definition` = nbrhood_chng,
 
                                     # Exclusion flag
-                                    `Binary Flag - Tract has unreliable data or meets other exclusion parameters` = nc_exclude_flag
+                                    `Binary Flag - Tract has unreliable data or meets other exclusion parameters` = nc_exclusion_flag
       )
 
       county_col = which(names(change_public) == "County")
