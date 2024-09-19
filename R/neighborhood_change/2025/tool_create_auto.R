@@ -1,7 +1,7 @@
 # -------------------------------------------------------------------------
 # Created by: Matt Alvarez-Nissen
 # Date created: July 8, 2024
-# Last revised: August 12, 2024
+# Last revised: Sep 16, 2024
 # Project: AFFH
 # Subproject: 2023 Neighborhood Change Workplan Research
 # Re: Create neighborhood change tool/overlay (automated)
@@ -24,6 +24,7 @@
 # Update log:
 # 7/9/24: added 1/4 mile buffer
 # 8/12/24: switch from county to region, high-income HHs to median income
+# 9/16/24: address Quinn's review comments
 
 # Setup -------------------------------------------------------------------
 
@@ -47,7 +48,7 @@ year_var <- 2022 ## Change end year here
 # Import data:
 
 ## Universal dataset (2020 boundaries)
-tract2020_df <- read_csv(paste0(homedir, "/Results/tract2020_08122024.csv"))
+tract2020_df <- read_csv(paste0(homedir, "/Results/tract2020_09162024.csv"))
 
 ## Prisoner population - 2020 (exclusion)
 prisoner_df <-
@@ -179,7 +180,7 @@ race_cv <-
 
 # Income CVs
 inc_cv <-
-  raceethend_df %>%
+  incomeend_df %>%
   mutate(
     se = margin_of_error_total/1.645,
     cv = (se / estimate_total) * 100,
@@ -520,7 +521,7 @@ income_df <-
     change_income13end_75pct =
       if_else(
         baseline_income13end == 1 &
-          trct_medinc_pctchng_00end >= medinc_quarter13end,
+          trct_medinc_pctchng_13end >= medinc_quarter13end,
         1, 0
       )
   ) %>%

@@ -155,27 +155,27 @@ function changeFlag(nbrhood_chng, exclude_flag) {
   }
 }
 
-function changeString(path_1a, path_1b, path_2, region, exclude_flag, college_flag) {
+function changeString(pathway1a, pathway1b, pathway2, region, exclude_flag, college_flag) {
   if (exclude_flag == 1) {
     return ""
-  } else if (path_1a == 1 && path_1b != 1 && path_2 != 1) {
+  } else if (pathway1a == 1 && pathway1b != 1 && pathway2 != 1) {
     return "<br><i>This Census tract <b>meets the Pathway 1A definition.</b>  See details below:</i><br><br>";
-  } else if (path_1a != 1 && path_1b == 1 && path_2 != 1) {
+  } else if (pathway1a != 1 && pathway1b == 1 && pathway2 != 1) {
     return "<br><i>This Census tract <b>meets the Pathway 1B definition.</b>  See details below:</i><br><br>";
-  } else if (path_1a != 1 && path_1b != 1 && path_2 == 1) {
+  } else if (pathway1a != 1 && pathway1b != 1 && pathway2 == 1) {
     return "<br><i>This Census tract <b>meets the Pathway 2 definition.</b>  See details below:</i><br><br>";
 
-  } else if (path_1a == 1 && path_1b == 1 && path_2 != 1) {
+  } else if (pathway1a == 1 && pathway1b == 1 && pathway2 != 1) {
     return "<br><i>This Census tract <b>meets the Pathway 1A and Pathway 1B definitions.</b>  See details below:</i><br><br>";
-  } else if (path_1a == 1 && path_1b != 1 && path_2 == 1) {
+  } else if (pathway1a == 1 && pathway1b != 1 && pathway2 == 1) {
     return "<br><i>This Census tract <b>meets the Pathway 1A and Pathway 2 definitions.</b>  See details below:</i><br><br>";
-  } else if (path_1a != 1 && path_1b == 1 && path_2 == 1) {
+  } else if (pathway1a != 1 && pathway1b == 1 && pathway2 == 1) {
     return "<br><i>This Census tract <b>meets the Pathway 1B and Pathway 2 definitions.</b>  See details below:</i><br><br>";
-  } else if (path_1a == 1 && path_1b == 1 && path_2 == 1) {
+  } else if (pathway1a == 1 && pathway1b == 1 && pathway2 == 1) {
     return "<br><i>This Census tract <b>meets the Pathway 1 and Pathway 2 definitions.</b>  See details below:</i><br><br>";
 
   
-  } else if (path_1a != 1 && path_1b != 1 && path_2 !=1 && region != "Rural Areas" && college_flag != 1) {
+  } else if (pathway1a != 1 && pathway1b != 1 && pathway2 !=1 && region != "Rural Areas" && college_flag != 1) {
     return "<br><i>This Census tract <b>does not meet the Pathway 1 or Pathway 2 definitions.</b>  See details below:</i><br><br>";
   } else if (region == "Rural Areas") {
     return "<br><i>Rural Areas <b>are not considered</b> in the Neighborhood Change map.</i><br><br>";

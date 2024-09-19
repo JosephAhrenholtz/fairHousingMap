@@ -220,7 +220,7 @@ map.on('load', () => {
                 properties.fips_bg,
                 properties.density_flag,
                 properties.military_flag,
-                properties.prison_flag
+                properties.instit_flag
             );
 
         // pass top-level opportunity results to sidebar
@@ -245,9 +245,9 @@ map.on('load', () => {
         // pass top-level change results to sidebar
         document.getElementById("top-level-change").innerHTML =
             changeString(
-                properties.path_1a,
-                properties.path_1b,
-                properties.path_2,
+                properties.pathway1a,
+                properties.pathway1b,
+                properties.pathway2,
                 properties.region,
                 properties.exclude_flag,
                 properties.college_flag
@@ -540,6 +540,34 @@ map.on('load', () => {
     map.touchZoomRotate.disableRotation();
 
 
+});
+
+
+// ensure pop up close buttin is accessible to screen readers by dynamically removing the "aria-hidden" attribute in Mapbox source code after it has been rendered)
+document.addEventListener('DOMContentLoaded', function() {
+    // function to remove aria-hidden attribute from the button
+    function removeAriaHidden() {
+        const closeButton = document.querySelector('.mapboxgl-popup-close-button');
+        if (closeButton) {
+            closeButton.removeAttribute('aria-hidden');
+        }
+    }
+
+    // observe changes in the DOM to detect when the Mapbox popup is added
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.classList && node.classList.contains('mapboxgl-popup')) {
+                        removeAriaHidden();
+                    }
+                });
+            }
+        });
+    });
+
+    // start observing the body for changes
+    observer.observe(document.body, { childList: true, subtree: true });
 });
 
 

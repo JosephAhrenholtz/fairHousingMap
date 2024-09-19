@@ -87,7 +87,7 @@ if(year >= 2025){
   assign("USDA_excluded", c('data-raw/shapefiles/2023/SFH_MFH_Ineligible20231206/SFH_MFH_IELG2020_CA.shp'), parent.frame())
 
   # neighborhood change
-  assign("nc_scores", c("R/neighborhood_change/2025/Results/Neighborhood Change Layer/nbrchange_2022end_08152024.csv"), parent.frame())
+  assign("nc_scores", c("R/neighborhood_change/2025/Results/Neighborhood Change Layer/nbrchange_2022end_09162024.csv"), parent.frame())
 }
 
 

@@ -1,7 +1,7 @@
 # -------------------------------------------------------------------------
 # Created by: Matt Alvarez-Nissen
 # Date created: Sept. 1, 2023
-# Last revised: Aug. 12, 2024
+# Last revised: Sept. 16, 2024
 # Project: AFFH
 # Subproject: 2023 Neighborhood Change Workplan Research
 # Re: Clean and prepare raw data for neighborhood change tool (streamlined version)
@@ -25,6 +25,7 @@
 
 # Update log:
 ## 8/12/2024: updated to address new NCM methodology
+## 9/16/2024: address Quinn's code review
 
 # Setup -------------------------------------------------------------------
 
@@ -1096,7 +1097,7 @@ medhval_cleaner <- function(df, year) {
         TRUE ~ .
       )
     ) %>%
-    bind_rows(tibble(moe_hval_hu = NA)) %>%
+    bind_rows(tibble(moe_hval_hu = NA, moe_medhval = NA)) %>%
     transmute(
       geography = geography,
       year = year,
@@ -1107,7 +1108,7 @@ medhval_cleaner <- function(df, year) {
         str_remove_all("null") %>%
         as.double(),
       moe_medhval =
-        str_remove_all(medhval, "\\+") %>%
+        str_remove_all(moe_medhval, "\\+") %>%
         str_remove_all("\\-") %>%
         str_remove_all("\\,") %>%
         str_remove_all("null") %>%
@@ -1330,7 +1331,6 @@ race_county_df <-
   raceeth_join("cnty")
 
 ## Home value
-
 medhval_county_df <-
   medhval_cleaner(
     medhval_county_00 %>%

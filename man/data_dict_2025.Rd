@@ -61,7 +61,7 @@ Final 2025 Fair Housing Map data dictionary for descriptions of all variables in
   \item change_race0022:	Binary flag if a LMI and BIPOC neighborhood in 2000 experienced an increase in the non-Hispanic white population above the regionwide threshold (2000-2022)
   \item change_race1322:	Binary flag if a BIPOC neighborhood in 2013 experienced an increase in the non-Hispanic white population above the 50% regionwide threshold (2013-2022)
   \item change_race1321_75pct:	Binary flag if a BIPOC neighborhood in 2013 experienced an increase in the non-Hispanic white population above the 75% regionwide threshold (2013-2022)
-  \item exclusion_flag	Binary flag if that tract has unreliable data or meets other exclusion parameters (e.g., prisoner population)
+  \item exclusion_flag	Binary flag if that tract has unreliable data or meets other exclusion parameters (e.g., institutionalized population)
   \item trct_medinc_pctchng_0022:	Percent change in tract's household median income between 2000 and 2022
   \item trct_medinc_pctchng_1322:	Percent change in tract's household median income between 2013 and 2022
   \item medinc_half0022:	Regionwide 50% threshold for tract-level median income percentage increase (2000-2022)

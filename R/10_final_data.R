@@ -70,7 +70,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, cog  =
     # create above/below median scores
     mutate_at(vars(!!!syms(ind_cols)), list(score = function(x) ifelse(x >= median(x, na.rm = TRUE), 1, 0))) %>%
     # save regional median values for charts
-    mutate_at(vars(!!!syms(ind_cols)), list(median = median), na.rm = TRUE) %>%
+    mutate_at(vars(!!!syms(ind_cols)), list(median = ~median(., na.rm = TRUE))) %>%
     ungroup()
 
 
@@ -114,14 +114,14 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, cog  =
            oppscore = ifelse(total_valid >= 7, oppscore, NA))
 
 
-  # invalidate scores with density, military, or prisoner flags
-  final$oppscore[which(final$prison_flag == 1 | final$military_flag == 1 |
+  # invalidate scores with density, military, or instituionalized pop flags
+  final$oppscore[which(final$instit_flag == 1 | final$military_flag == 1 |
                          final$density_flag == 1)] <- NA
 
   # load native land flag and apply hps invalidations
   final <- final %>%
     left_join(tribal_overlap(), by = 'fips')
-  final$pov_seg_flag[which(final$prison_flag == 1 | final$military_flag == 1 |
+  final$pov_seg_flag[which(final$instit_flag == 1 | final$military_flag == 1 |
                              final$density_flag == 1 | final$nativeland_flag == 1)] <- NA
 
   # add single exclusion flag
@@ -129,7 +129,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, cog  =
     mutate(exclude_flag =
              case_when(
                density_flag == 1 ~ 1,
-               prison_flag == 1 ~ 1,
+               instit_flag == 1 ~ 1,
                military_flag == 1 ~ 1,
                TRUE ~ 0
              ))
@@ -383,7 +383,7 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
                               cvhomevalue=((moe_home_value/1.645)/home_value)*100,
                               cvpov=((moe_pct_below_pov/1.645)/pct_below_pov)*100,
                               povflag = 0, baplusflag = 0, empflag = 0, homeflag = 0, conpovcv = 0,
-                              prison_flag = 0, military_flag = 0, density_flag = 0)
+                              instit_flag = 0, military_flag = 0, density_flag = 0)
 
 
   final_prep$povflag[which(final_prep$pct_above_200_pov == 0 | is.na(final_prep$pct_above_200_pov) |
@@ -401,8 +401,8 @@ final_prepare <- function(year = current_year, geo = 'tract', .data=NULL){
 
 
 
-  #create flags for prison, military, and density
-  final_prep$prison_flag[which(final_prep$pct_prisoner_2020 > 0.75)] <- 1
+  #create flags for institutionalized pop, military, and density
+  final_prep$instit_flag[which(final_prep$pct_instit_2020 > 0.75)] <- 1
   final_prep$military_flag[which(final_prep$pct_military >= 0.5)] <- 1
   final_prep$density_flag[which((final_prep$pop_density < 25 &
                                    final_prep$total_pop < 750))] <- 1

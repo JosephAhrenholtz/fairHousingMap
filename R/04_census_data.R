@@ -113,7 +113,7 @@ read_census_data <- function(year = current_year, geo = 'tract'){
   # rename and calculate pct institutionalized pop
   census_table <- dplyr::transmute(raw_census_table, fips = GEOID, countyid = substr(fips,1,5),
                                   total_pop_2020 = P1_001N,
-                                  pct_prisoner_2020 = P5_002N/total_pop_2020
+                                  pct_instit_2020 = P5_002N/total_pop_2020
   )
 
   if(geo == 'block group'){
