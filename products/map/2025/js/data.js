@@ -93,55 +93,62 @@ const indicators = [
   },
   // change
   {
-    domain: "change1",
+    // domain: "change1",
+    domain: "change1a_race",
     label: [["Non-Hispanic White"], "Share Change (pp)"],
     name: "trct_raceeth_chng0022",
     threshName: "raceeth_half0022",
   },
   {
-    domain: "change1",
+    // domain: "change1",
+    domain: "change1a_income",
     label: [["Median-Income"], "Change (%)"],
     name: "trct_medinc_pctchng_0022",
     threshName: "medinc_half0022",
   },
   {
-    domain: "change1b",
+    // domain: "change1b",
+    domain: "change1b_race",
     label: [["Non-Hispanic White"], "Share Change (pp)"],
     name: "trct_raceeth_chng1322",
     threshName: "raceeth_quarter1322",
   },
   {
-    domain: "change1b",
+    // domain: "change1b",
+    domain: "change1b_income",
     label: [["Median-Income"], "Change (%)"],
     name: "trct_medinc_pctchng_1322",
     threshName: "medinc_quarter1322",
   },
   {
-    domain: "change2",
+    // domain: "change2",
+    domain: "change2_race",
     label: [["Non-Hispanic White"], "Share Change (pp)"],
     name: "trct_raceeth_chng1322",
     threshName: "raceeth_half1322",
   },
   {
-    domain: "change2",
+    // domain: "change2",
+    domain: "change2_income",
     label: [["Median-Income"], "Change (%)"],
     name: "trct_medinc_pctchng_1322",
     threshName: "medinc_half1322",
   },
   {
-    domain: "change3",
-    // label: "Relative Rent Change (%)",
-    label: [["Relative Rent"], "Change (%)"],
-    name: "trct_pctchng_medrent1322",
-    threshName: "rent_half1322",
-  },
-  {
-    // domain: "change4",
-    domain: "change3",
+    // domain: "change3",
+    domain: "change2_gap",
     label: [["Home Value/"], "Income Gap (pp)"],
     name: "pct_gap",
     threshName: "gap_thresh",
   },
+  {
+    // domain: "change3",
+    domain: "change2_rent",
+    label: [["Relative Rent"], "Change (%)"],
+    name: "trct_pctchng_medrent1322",
+    threshName: "rent_half1322",
+  },
+  
 ];
 
 // ajax call to postgres db

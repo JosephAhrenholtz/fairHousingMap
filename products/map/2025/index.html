@@ -60,10 +60,6 @@
           <!-- <span class="sidebar-close"><i class="fa fa-caret-left"></i></span> -->
         </h1>
 
-        <!-- <div class="sidebar-head">
-          <img src="image/CTCAC-logo.png" alt="logo" style="width:10%"/>
-          <img src="image/hcd-logo.png" alt="logo" style="width: 10%">
-        </div> -->
 
         <p class="panel-text">
           <br>
@@ -153,12 +149,12 @@
 
           <!-- econ1 chart -->
           <div id="econ1-container">
-              <canvas id="econ1Canv" width="325" height="103"></canvas>
+              <canvas id="econ1_canv" width="325" height="103"></canvas>
           </div>
 
           <!-- econ2 chart -->
           <div id="econ2-container">
-            <canvas id="econ2Canv" width="325" height="65"></canvas>
+            <canvas id="econ2_canv" width="325" height="65"></canvas>
           </div>
 
           <!-- education chart title -->
@@ -166,7 +162,7 @@
             <span>Education</span>
           </div>
           <div id="edu-container">
-            <canvas id="eduCanv" width="325" height="130"></canvas>
+            <canvas id="edu_canv" width="325" height="130"></canvas>
           </div>
 
 
@@ -200,7 +196,7 @@
              <b>Neighborhood Opportunity Key:</b>
           </div>
           <div class="chart-legend">
-            <span class="key-box reg-leg"></span>Regional median threshold for opportunity indicators
+            <span class="key-box reg-leg"></span>Regional threshold for opportunity indicators
           </div>
 
           <div class="neat-line"></div>
@@ -233,7 +229,7 @@
           </div>
           
           <div id="pov-container">
-            <canvas id="povCanv" width="325" height="65"></canvas>
+            <canvas id="pov_canv" width="325" height="65"></canvas>
           </div>
 
 
@@ -244,14 +240,14 @@
           </div>
 
           <div id="seg-container">
-            <canvas id="segCanv" width="325" height="130"></canvas>
+            <canvas id="seg_canv" width="325" height="130"></canvas>
           </div>
 
           <div class="chart-legend">
             <b>High-Poverty & Segregated Key:</b>
           </div>
           <div class="chart-legend">
-            <span class="key-box reg-leg"></span>Threshold for high-poverty or racial/ethnic segregation
+            <span class="key-box reg-leg"></span>Universal threshold for high-poverty or racial/ethnic segregation
           </div>
           <div class="neat-line"></div>
         </details>
@@ -303,8 +299,11 @@
           </div>
 
           <!-- path 1a race/income change chart -->
-          <div id="change1-container">
-            <canvas id="change1Canv" width="325" height="110" ></canvas>
+          <div>
+            <canvas id="change1a_race_canv" width="325" height="65" ></canvas>
+          </div>
+          <div>
+            <canvas id="change1a_income_canv" width="325" height="73" ></canvas>
           </div>
 
           
@@ -334,8 +333,11 @@
           </div>
 
           <!-- path 1b race/income change chart -->
-          <div id="change1b-container">
-            <canvas id="change1bCanv" width="325" height="110" ></canvas>
+          <div>
+            <canvas id="change1b_race_canv" width="325" height="65" ></canvas>
+          </div>
+          <div>
+            <canvas id="change1b_income_canv" width="325" height="73" ></canvas>
           </div>
           
           <!-- path 2 -->
@@ -391,21 +393,28 @@
 
 
           <!-- path 2 race/income change chart -->
-          <div id="change2-container">
-            <canvas id="change2Canv" width="325" height="110"></canvas>
+          <div>
+            <canvas id="change2_race_canv" width="325" height="65"></canvas>
+          </div>
+          <div>
+            <canvas id="change2_income_canv" width="325" height="73"></canvas>
           </div>
 
           <!-- path 2 rent change/gap chart -->
-          <div id="change3-container">
-            <canvas id="change3Canv" width="325" height="110"></canvas>
+          <div>
+            <canvas id="change2_gap_canv" width="325" height="65"></canvas>
           </div>
+          <div>
+            <canvas id="change2_rent_canv" width="325" height="65"></canvas>
+          </div>
+          
 
 
           <div class="chart-legend">
             <b>Neighborhood Change Key:</b>
           </div>
           <div class="chart-legend">
-            <span class="key-box reg-leg"></span>County Threshold for Neighborhood
+            <span class="key-box reg-leg"></span>Regional Threshold for Neighborhood
             Change
           </div>
         </details>

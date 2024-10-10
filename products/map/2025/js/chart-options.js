@@ -9,15 +9,19 @@
 
 
 // define canvases
-const ctx1 = document.getElementById("econ1Canv").getContext("2d");
-const ctx2 = document.getElementById("econ2Canv").getContext("2d");
-const ctx3 = document.getElementById("eduCanv").getContext("2d");
-const ctx4 = document.getElementById("povCanv").getContext("2d");
-const ctx5 = document.getElementById("segCanv").getContext("2d");
-const ctx6 = document.getElementById("change1Canv").getContext("2d");
-const ctx7 = document.getElementById("change1bCanv").getContext("2d");
-const ctx8 = document.getElementById("change2Canv").getContext("2d");
-const ctx9 = document.getElementById("change3Canv").getContext("2d");
+const ctx1 = document.getElementById("econ1_canv").getContext("2d");
+const ctx2 = document.getElementById("econ2_canv").getContext("2d");
+const ctx3 = document.getElementById("edu_canv").getContext("2d");
+const ctx4 = document.getElementById("pov_canv").getContext("2d");
+const ctx5 = document.getElementById("seg_canv").getContext("2d");
+const ctx6 = document.getElementById("change1a_race_canv").getContext("2d");
+const ctx7 = document.getElementById("change1a_income_canv").getContext("2d");
+const ctx8 = document.getElementById("change1b_race_canv").getContext("2d");
+const ctx9 = document.getElementById("change1b_income_canv").getContext("2d");
+const ctx10 = document.getElementById("change2_race_canv").getContext("2d");
+const ctx11 = document.getElementById("change2_income_canv").getContext("2d");
+const ctx12 = document.getElementById("change2_gap_canv").getContext("2d");
+const ctx13 = document.getElementById("change2_rent_canv").getContext("2d");
 
 
 
@@ -52,15 +56,16 @@ function changeFlag(nbrhood_chng) {
   }
 }
 
-
-const changeScale = {
+// scale for percantage point change
+const change_pp_scale = {
   ticks: {
     callback: (value) => {
       return `${Math.round(value * 100)}%`;
     },
+    stepSize: 0.25
   },
-  suggestedMin: -0.4,
-  suggestedMax: 0.4,
+  suggestedMin: -0.25,
+  suggestedMax: 0.25,
   beginAtZero: true,
 
   grid: {
@@ -68,13 +73,14 @@ const changeScale = {
   },
 };
 
-const rentScale = {
+// scale for percentage change
+const change_percent_scale = {
   ticks: {
     callback: (value) => {
       return `${Math.round(value * 100)}%`;
     },
   },
-  suggestedMin: 0,
+  suggestedMin: -1,
   suggestedMax: 1,
   beginAtZero: true,
 
@@ -404,7 +410,7 @@ const segOptions = {
 };
 
 // change options
-const changeOptions = {
+const change_race_options = {
   layout: {
     padding: {
       left: 40
@@ -435,12 +441,47 @@ const changeOptions = {
     y2: {
       display: false,
     },
-    x: changeScale,
+    x: change_pp_scale,
+  },
+};
+const change_income_options = {
+  layout: {
+    padding: {
+      left: 64
+    }
+  },
+  responsive: true,
+  indexAxis: "y",
+  plugins: {
+    maintainAspectRatio: false,
+    tooltip: tipPercent,
+    legend: {
+      display: false,
+    },
+  },
+  // plot bar and regional median
+  scales: {
+    y: {
+      ticks: {
+        min: 0,
+        autoSkip: false,
+        crossAlign: "far",
+        padding: 10,
+      },
+      stacked: false,
+      grid: {
+        display: false,
+      },
+    },
+    y2: {
+      display: false,
+    },
+    x: change_percent_scale,
   },
 };
 
 
-const rentChangeOptions = {
+const change_gap_options = {
   layout: {
     padding: {
       left: 51
@@ -471,14 +512,14 @@ const rentChangeOptions = {
     y2: {
       display: false,
     },
-    x: rentScale,
+    x: change_pp_scale,
   },
 };
 
-const gapChangeOptions = {
+const change_rent_options = {
   layout: {
     padding: {
-      left: 52
+      left: 77
     }
   },
   responsive: true,
@@ -496,6 +537,7 @@ const gapChangeOptions = {
       ticks: {
         min: 0,
         autoSkip: false,
+        crossAlign: "far",
       },
       stacked: false,
       grid: {
@@ -505,7 +547,7 @@ const gapChangeOptions = {
     y2: {
       display: false,
     },
-    x: rentScale,
+    x: change_percent_scale,
   },
 };
 

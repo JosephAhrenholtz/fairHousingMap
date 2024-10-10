@@ -1,4 +1,4 @@
-mapboxgl.accessToken = 'pk.eyJ1Ijoiam9zZXBoZGEiLCJhIjoiY2w4dXRweDk4MDdnNDNxcXFuanl2MjlleSJ9.Aky4KhFWco15pmsnoLfhYA';
+mapboxgl.accessToken = 'pk.eyJ1Ijoiam9zZXBoZGEiLCJhIjoiY20xOWc3Y3RhMDEzaTJrcTMwbjBnMzhsYSJ9.UfpE3U-Tanwbfa0N-Ms9XQ';
 
 
 const bounds = [
@@ -305,7 +305,8 @@ map.on('load', () => {
                     } else {
                         barColors.push("#bdbdbd");
                     }
-                } else if (d == "change1" || d == "change1b" || d == "change2" || d == "change3" || d == "change4") {
+                // } else if (d == "change1" || d == "change1b" || d == "change2" || d == "change3" || d == "change4") {
+                } else if (d.startsWith("change")) {
                     if (val1 >= val2) {
                         barColors.push("#dd3497");
                     } else {
@@ -397,16 +398,19 @@ map.on('load', () => {
         let config = {};
 
         // create charts
-        getCharts(d = "econ1", options = econ1Options, canvas = "econ1Canv");
-        getCharts(d = "econ2", options = econ2Options, canvas = "econ2Canv");
-        getCharts(d = "edu", options = eduOptions, canvas = "eduCanv");
-        getCharts(d = "pov", options = povOptions, canvas = "povCanv");
-        getCharts(d = "seg", options = segOptions, canvas = "segCanv");
-        getCharts(d = "change1", options = changeOptions, canvas = "change1Canv");
-        getCharts(d = "change1b", options = changeOptions, canvas = "change1bCanv");
-        getCharts(d = "change2", options = changeOptions, canvas = "change2Canv");
-        getCharts(d = "change3", options = rentChangeOptions, canvas = "change3Canv");
-        // getCharts(d = "change4", options = gapChangeOptions, canvas = "change4Canv");
+        getCharts(d = "econ1", options = econ1Options, canvas = "econ1_canv");
+        getCharts(d = "econ2", options = econ2Options, canvas = "econ2_canv");
+        getCharts(d = "edu", options = eduOptions, canvas = "edu_canv");
+        getCharts(d = "pov", options = povOptions, canvas = "pov_canv");
+        getCharts(d = "seg", options = segOptions, canvas = "seg_canv");
+        getCharts(d = "change1a_race", options = change_race_options, canvas = "change1a_race_canv");
+        getCharts(d = "change1a_income", options = change_income_options, canvas = "change1a_income_canv");
+        getCharts(d = "change1b_race", options = change_race_options, canvas = "change1b_race_canv");
+        getCharts(d = "change1b_income", options = change_income_options, canvas = "change1b_income_canv");
+        getCharts(d = "change2_race", options = change_race_options, canvas = "change2_race_canv");
+        getCharts(d = "change2_income", options = change_income_options, canvas = "change2_income_canv");
+        getCharts(d = "change2_gap", options = change_gap_options, canvas = "change2_gap_canv");
+        getCharts(d = "change2_rent", options = change_rent_options, canvas = "change2_rent_canv");
 
 
 
