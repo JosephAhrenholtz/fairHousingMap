@@ -66,11 +66,6 @@ if(year >= 2024){
   # neighborhood change - get updated code from Matt that includes baseline_race0021.  He sent file but not updated code.
   assign("nc_scores", c("R/neighborhood_change/2024/Results/Neighborhood Change Layer/neighborhood_change_layer_04042024.csv"), parent.frame())
 
-  # supplementary data
-  assign("pres_db_locations", c('data-raw/shapefiles/2024/chpc_pdb/OBI_presdb_geocoded_03202024.csv'), parent.frame())
-  assign("pres_db_attributes", c('data-raw/shapefiles/2024/chpc_pdb/\\OBI PDB Request_012224.xlsx'), parent.frame())
-  assign("segcat", c(2020, "cat_seg_ca_2020.csv"), parent.frame())
-
 }
 
 if(year >= 2025){
@@ -88,6 +83,10 @@ if(year >= 2025){
 
   # neighborhood change
   assign("nc_scores", c("R/neighborhood_change/2025/Results/Neighborhood Change Layer/nbrchange_2022end_09162024.csv"), parent.frame())
+
+  # supplementary data - large family LIHTC awards through 2023
+  assign("lf_lihtc", c('data-raw/shapefiles/2023/chp_pdb/LF_LIHTC_OBI_09242024.gpkg'), parent.frame())
+
 }
 
 
