@@ -1,0 +1,17 @@
+body {
+    margin: 0;
+    display: flex;
+    height: 100vh;
+}
+
+#sidepanel {
+    width: 400px;
+    background-color: #f4f4f4;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#map {
+    flex-grow: 1;
+    background-color: #e5e5e5;
+}
