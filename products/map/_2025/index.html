@@ -5,15 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Map with Side Panel</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="sidepanel">
-        <h1>Side Panel</h1>
-        <p>Content goes here...</p>
+        <div id="title-container">
+            <div class="title-content">
+                <img src="image/mock_logo.png" alt="Logo" class="title-logo">
+                <h1>2025 AFFH Mapping Tool</h1>
+            </div>
+            <div class="button-container">
+                <button class="mode-button">Neighborhood Results Mode</button>
+                <button class="mode-button special-padding">Siting Analysis Mode</button>
+            </div>
+        </div>
+
+
+        <div id="results-container">
+            <p>Neighborhood results go here...</p>
+        </div>
+
+        <div id="analysis-container">
+            <p>LIHTC analysis goes here...</p>
+        </div>
+
+        <div id="bottom-ribbon-container">
+            <a href="#about">About</a>
+            <a href="#faq">FAQ</a>
+            <a href="#methods">Methods</a>
+            <a href="#download">Download</a>
+        </div>
+        
+        
+        
     </div>
     <div id="map">
         <h1>Map Container</h1>
         <p>Map will be displayed here...</p>
     </div>
+    <script src="js/sidepanel.js"></script>
 </body>
 </html>
