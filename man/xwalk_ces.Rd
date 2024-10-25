@@ -26,8 +26,8 @@ Imports CalEnviroScreen 4.0 site-based measurements (cleanup sites, hazardous wa
 from the final 2023 TCAC file, creates a binary score for tracts in the bottom 5% of site-based hazards within regions, then
 crosswalks to 2020 tracts using an overlay method of >= 5% of intersecting land area.  The cross walking approach is a stop gap
 until OEHHA updates to 2020 boundaries.  The overlay approach was chosen over a weighted allocation (e.g. by area or population)
-because the site-based measures are already interpolated by OEHHA from points to tracts, and the research partners wanted to
-avoid re-interpolating already interpolated data.
+because the site-based measures are already interpolated by OEHHA from points to tracts, and the research partners decided to
+avoid re-interpolating the data.
 }
 \examples{
 xwalk_ces(year = 2024, write = TRUE) # writes a new file to the intermediate directory

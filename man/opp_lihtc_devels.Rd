@@ -4,11 +4,9 @@
 \alias{opp_lihtc_devels}
 \title{Plot 9% and 4% large-family, new construction LIHTC across opportunity/segregation categories pre- and post-policy adoption}
 \source{
-Preservation Database extraction share by CHPC
+CHPC Preservation Database
 
-2024 CTCAC/HCD Opportunity Map
-
-OBI Categorical segregation: https://berkeley.app.box.com/file/1298215376451
+2025 CTCAC/HCD Opportunity Map
 }
 \usage{
 opp_lihtc_devels()
@@ -23,19 +21,7 @@ Cutoff year is 2019 for 9% projects and 2021 for 4% projects.  Currently, we inc
    summarizes and plots the data, and the figures are saved as .tiff files in the products/charts directory.
 }
 \note{
-The code below was adjusted in March, 2024 per HCD request to treat High-Poverty & Segregated as an exclusive category,
-   though in the 2024 map it was shifted to an overlay.  This will likely change in future iterations as the research
-   partners identify an alternative way to present the data that is more aligned with the current mapping methodology.
-
-   Additionally, this code was written in parallel to CHPC updating their geocoding standardization process.  Once this process
-   is finalized, the input files or fields may be adjusted.  Currently, CHPC is sharing one file for locations and a second file
-   with project details.  The files can be difficult to join because of duplicate id's, project names, app id's, and addresses.
-   OBI should request that they share a single file to avoid these issues.
-
-   The two function calls currently do not include parameters.  If the charts do not change significantly in 2025 than parameters can
-   be written to specify the year.  If the 2025 charts change significantly than the 2024 code may need to be archived and a new script written.
-   The charts produced in 2022 are not reproducible because many projects needed to be manually located, which spurred efforts in 2023 between
-   CHPC and OBI to standardize and document the geocoding process .  There were no charts made using the 2023 map.
+The code below was adjusted in September, 2024 for analysis to be included in the draft 2025 OM FAQ.
 }
 \examples{
 opp_lihtc_devels() # call first

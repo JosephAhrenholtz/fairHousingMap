@@ -1,11 +1,11 @@
 Package: fairHousingMap
 Type: Package
-Title: Create CTCAC/HCD Fair Housing Map
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: Code that produces the CTCAC/HCD Fair Housing Map
-License: What license is it under?
+Title: Functions to produce the CTCAC/HCD AFFH Mapping Tool
+Version: 2.0
+Author: Joseph Ahrenholtz
+Maintainer: Joseph Ahrenholtz <josephda@berkeley.edu>
+Description: Processes various datasets from the census, CA department of education, and CalEnviroScreen, among others, and classifies geographies in terms of opportunity, gentrification, and segregated areas of poverty. The package is designed to streamline the workflow for the annual update process.
+License: For internal UC Berkeley use only
 Encoding: UTF-8
 LazyData: true
 Imports: 

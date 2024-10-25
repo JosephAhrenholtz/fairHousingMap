@@ -22,5 +22,5 @@ neighborhood_change(year = 2024) # imports neighborhood change output and reduce
 
 }
 \author{
-Matt Alvarez-Nissen `mnissen@chpc.net`
+of neighborhood change is code Matt Alvarez-Nissen `mnissen@chpc.net`
 }

@@ -90,7 +90,6 @@ shape_rural(write = T) # write = T will generate a new file
 Contains `create_regions()`, which evaluates which regions that each county belongs to, then uses `rural_overlay()` to pinpoint rural tracts. `rural_overlay()` merges block centers with the rural_shapefile, and classifies the population of any block with its centroid inside the rural shapefile as rural. It then collapses to tract level, and any tract with over 50 percent population as rural is classified as "Rural Areas." `create_regions(write = T)` generates the required intermediate file, tract_county_region.csv.
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-##SSN (9/12): first run needs: create_regions(write = T)
 create_regions(write = T) # reads the existing file, set to False to generate new
 ```
 

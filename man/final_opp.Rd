@@ -17,7 +17,7 @@ final_prepare(year = current_year, geo = "tract", .data = NULL)
 
 \item{write}{write the final output}
 
-\item{cog}{logical to write COG referenced shapefile for HCD AFFH Data Viewer.  Is tract-only.  Counties within COG are COG-referenced.  Counties outside of COGS are county-referenced.}
+\item{cog}{logical to write COG referenced shapefile for HCD to be used in housing element update process.}
 
 \item{geo}{allows for opportunity to be assessed at the tract level in urban areas and block group in rural areas}
 

@@ -1,25 +1,36 @@
 README
 ================
-2023-08-08
+Joseph Ahrenholtz
+2024-08-19
 
-## Fair Housing Map
+## fairHousingMap
 
-In process documentation for CTCAC/HCD Opportunity and Neighborhood
-Change Map package, temporarily called the “Fair Housing Map” until
-directed further by CTCAC and HCD. Please see the [draft
-methodology](https://docs.google.com/document/d/1_wk_B9l0ZVSAr6bSoVROc7xuwTteyJxc/edit?usp=sharing&ouid=106736372141423442162&rtpof=true&sd=true)
-for details on the mapping approach.
+### Statement of Purpose
+
+The
+[`fairHousingMap`](https://github.com/JosephAhrenholtz/fairHousingMap "Go to definition")
+package is designed to facilitate the creation of the Affirmatively
+Furthering Fair Housing (AFFH) Mapping Tool, used by the California Tax
+Credit Allocation Committee (CTCAC) and the California Department of
+Housing and Community Development (HCD) to guide the siting of
+incentive-eligible affordable housing using a federal tax credit. This
+package provides tools to process various datasets from the census, CA
+department of education, and CalEnviroScreen, among others, and
+classifies geographies in terms of opportunity, gentrification, and
+segregated areas of poverty. The package is designed to streamline the
+workflow for the annual update process. The latest release of the tool
+can be found
+[here](https://belonging.berkeley.edu/2024-hcd-affh-mapping-tool).
 
 ### Installation
 
-1.  Clone repository
+1.  Clone GitHub repository and download data-raw directory from
+    [Drive](https://drive.google.com/drive/folders/1p0_igbmI02SInUi22O5naaki1f1Q_YKl?usp=drive_link)
+    and extract into root directory.
 
-2.  Download data-raw directory and extract into root directory:
-    <https://berkeley.app.box.com/folder/224592265510>
+2.  Open package using “fairHousingMap.Rproj” file
 
-3.  Open package using “fairHousingMap.Rproj” file
-
-4.  Load package and install dependencies:
+3.  Load package and install dependencies:
 
 ``` r
 devtools::install_dev_deps()
@@ -31,9 +42,9 @@ devtools::load_all()
 
 ### Final Dataset
 
-The final dataset can be loaded by calling `data(final_2024)`. All
-variables are documented and the data dictionary can be loaded using
-`?final_opp_data`.
+The most recent dataset can be loaded by calling `data(final_2025)`. All
+variables are documented in the the data dictionary which can be loaded
+using `?data_dict_2025`.
 
 ### Census API
 
@@ -45,14 +56,15 @@ variables are documented and the data dictionary can be loaded using
 
 ### Directory Structure
 
-- *data* - .Rda files of census polygon geographies.
+- *data* - .Rda files of census polygon geographies, as well published
+  datasets for convenient loading.
 
   - *intermediate* - intermediate data files.
 
 - *analysis* - .Rmd files of internal reports, exploratory analysis,
   etc.
 
-- *output* - Published datasets
+- *output* - final map data, public summary and shapefiles files
 
 - *README* - project root documentation
 
@@ -61,16 +73,19 @@ variables are documented and the data dictionary can be loaded using
 - *R* - R package functions, executes all code that goes into published
   tables and maps
 
-- *map* - javascript webmaps
+- products
 
-- *tests* - testthat tests to ensure package is working as expected
+  - map - javascript mapping tool
 
-### TODO
+  - charts - LIHTC distribution
 
-- Develop testthat test suite (in progress as of 9/4/2023).
+- *tests* - testthat unit tests to ensure package is working as expected
+
+### TO DO
+
 - The legacy packages maptools, rgdal, and rgeos, underpinning the sp
-  package, which is a dependency, will retire in October 2023. Replace
-  functions that depend on sp with sf package equivalents.
+  package, which is a dependency, are set to retire. Replace functions
+  that depend on sp with sf package equivalents.
 
 ### Running the package
 
@@ -97,14 +112,8 @@ rural_shapefile.shp, which must exist in the intermediate directory to
 proceed.
 
 ``` r
-shape_rural(write = F) # write = T will generate a new file
+shape_rural(write = T) # write = T will generate a new file
 ```
-
-``` r
-mapview::mapview(shape_rural(write = F)) # to map the shapefile
-```
-
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 #### **03_create_region_designation.R**
 
@@ -118,7 +127,7 @@ Areas.” `create_regions(write = T)` generates the required intermediate
 file, tract_county_region.csv.
 
 ``` r
-create_regions(read = T) # reads the existing file, set to False to generate new
+create_regions(write = T) # reads the existing file, set to False to generate new
 ```
 
 #### 04_census_data.R
@@ -131,11 +140,11 @@ calculates margins of error for derived variables. Both
 intermediate tract- and block group-level data.
 
 ``` r
-all_census_data(geo = 'tract', read = T, write = F) # for tracts
+all_census_data(geo = 'tract', read = T, write = T) # for tracts
 ```
 
 ``` r
-all_census_data(geo = 'bg', read = T, write = F) # for block groups
+all_census_data(geo = 'bg', read = T, write = T) # for block groups
 ```
 
 #### 05_education_data.R
@@ -150,7 +159,7 @@ school students. `graduation_rates()` imports and writes cohort-weighted
 high school graduate rates to the intermediate directory.
 
 ``` r
-graduation_rates(write = F) # set to True to generate new data
+graduation_rates(write = T) # set to True to generate new data
 ```
 
 #### 06_education_distance.R
@@ -160,32 +169,46 @@ block group centroids, and averages the reading and math scores, frpm,
 and graduation rates of the three nearest schools.
 
 ``` r
-school_distances(read = T, write = F) # set read to False, write to True to generate new data
+school_distances(write = T, geo='tract')
+school_distances(write = T, geo='bg')
 ```
 
 #### 07_enviroscreen.R
 
 Contains `xwalk_ces()` which imports CalEnviroScreen 4.0 site-based
 measurements (cleanup sites, hazardous waste, groundwater threats, solid
-waste) from the final 2023 TCAC file, creates a binary score for tracts
-in the bottom 5% of site-based hazards within regions, then crosswalks
-to 2020 tracts using an overlay method of \>= 5% of intersecting land
-area.
+waste) from the final 2023 processed opportunity data, creates a binary
+score for tracts in the bottom 5% of site-based hazards within regions,
+then crosswalks to 2020 tracts using an overlay method of \>= 5% of
+intersecting land area. This is a temporary stop-gap method until OEHHA
+releases CalEnviroScreen at 2020 geographies.
 
 ``` r
-xwalk_ces(read = T, write = F)
+xwalk_ces(write = T)
 ```
 
 #### 08_neighborhood_change.R
 
 Contains `read_neighborhood_change()` which imports neighborhood change
-data generated by CHPC. CHPC’s scripts are located in
-R/neighborhood_change/ and identify tracts that have experienced both
-long-term (since 2000) and recent (since 2013) racial/ethnic and
-economic change. `read_neighborhood_change()` is called in the
-subsequent script.
+data. Neighborhood change code was developed by Matt Alvarez-Nissen with
+California Housing Partnership. Neighborhood change scripts and output
+are located in R/neighborhood_change/. This directory is seperated from
+the rest of the package and does not contain documented functions. The
+scripts identify tracts that have experienced both long-term (since
+2000) and recent (since 2013) racial/ethnic and economic change, as well
+as markers of disproportionate housing needs.
+`read_neighborhood_change()` is called in the final script.
 
-#### 09_final_data.R
+#### 09_tribal_land.R
+
+Contains `tribal_overlap()`which imports tribal lands under the control
+of federally-recognized tribes, computes intersection with Census
+tracts, and flags any tract where at least 25 percent of the geography’s
+land area is within federally-recognized tribal lands. In final_data.R,
+High-Poverty & Segregated is not assessed in tracts where the tribal
+land flag is raised.
+
+#### 10_final_data.R
 
 Contains `final_opp()` which loads and combines all intermediate files
 of economic, education, and environmental indicators, creates the final
@@ -193,11 +216,15 @@ opportunity scores and designations. `read_neighborhood_change()` is
 called and joined to the final data frame.
 
 ``` r
-final_opp()
+final_opp(write = T)
 ```
+
+#### 11_final_public.R
+
+Loads final opportunity and neighborhood change data and creates excel
+workbook summary files, shapefiles, and data dictionaries to be
+published on CTCAC and HCD websites.
 
 ``` r
-mapview::mapview(final_opp(as_geo = T), zcol = 'oppcat') # to map the output
+final_opp_public(write = T, change = T)
 ```
-
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->

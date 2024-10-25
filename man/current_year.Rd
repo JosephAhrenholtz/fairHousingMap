@@ -3,7 +3,8 @@
 \docType{data}
 \name{current_year}
 \alias{current_year}
-\title{Reader functions for zipped files}
+\title{Includes miscellaneous helpers, including setting the default year, reader functions for zipped files,
+and data visualization themes.}
 \format{
 An object of class \code{numeric} of length 1.
 }
@@ -19,7 +20,8 @@ current_year
 the raw data file
 }
 \description{
-Reader functions for zipped files
+Includes miscellaneous helpers, including setting the default year, reader functions for zipped files,
+and data visualization themes.
 }
 \examples{
 read_zip(acs_variables, year = 2024, type = 'csv')

@@ -23,9 +23,6 @@ a shapefile
 Imports USDA shapefile for areas ineligible for rural designation, then shrinks to only California data and subtracts them from the
 complete California shapefile to get a rural areas shapefile.
 }
-\note{
-as of 06/2024, eligibility file is downloading as a geodatabase with null values in the state name field.  The "_CA" suffixed file was pre-processed in ArcGIS.  May consider reaching out to someone at USDS to see why fields are null before publishing.
-}
 \examples{
 shape_rural(write = T) # computes and writes the rural shapefile to the intermediate directory
 

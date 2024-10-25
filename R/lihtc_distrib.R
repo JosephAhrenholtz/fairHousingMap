@@ -14,8 +14,7 @@
 #' plot_lihtc_devels() # call second
 #'
 #'
-#' @source Preservation Database extraction share by CHPC in September, 2024.  The DSA with CHPC requires that we delete the data
-#' once we run the analysis.  This code is only to be run within agreed upon timeframe of the DSA, which can be found here: https://berkeley.box.com/s/j5fhauebi4rw64f957ysdsvatzl08zib.
+#' @source CHPC Preservation Database
 #' @source 2025 CTCAC/HCD Opportunity Map
 #'
 #' @import dplyr tidyr stringr ggplot2 scales
