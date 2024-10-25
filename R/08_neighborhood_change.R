@@ -16,7 +16,7 @@
 #'
 #'
 #'
-#' @author Matt Alvarez-Nissen `mnissen@chpc.net`
+#' @author of neighborhood change is code Matt Alvarez-Nissen `mnissen@chpc.net`
 #' @export
 read_neighborhood_change <- function(year = current_year){
   filepaths(year=year)

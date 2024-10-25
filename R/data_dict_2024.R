@@ -1,6 +1,4 @@
-#' fairHousingMap data dictionary
-#'
-#' Final 2024 Fair Housing Map data dictionary for descriptions of all variables included in the mapping interface.
+#' AFFH Mapping Tool data dictionary.  Includes all variables included in the 2024 mapping interface.
 #'
 #' \itemize{
 #'   \item fips: Census tract ID.

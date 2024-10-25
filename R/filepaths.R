@@ -84,8 +84,8 @@ if(year >= 2025){
   # neighborhood change
   assign("nc_scores", c("R/neighborhood_change/2025/Results/Neighborhood Change Layer/nbrchange_2022end_09162024.csv"), parent.frame())
 
-  # supplementary data - large family LIHTC awards through 2023
-  assign("lf_lihtc", c('data-raw/shapefiles/2023/chp_pdb/LF_LIHTC_OBI_09242024.gpkg'), parent.frame())
+  # Large family LIHTC awards for analysis - Note: CHPC data sharing agreement stipulates this sensitive data is deleted after charts are created
+  #assign("lf_lihtc", c('data-raw/shapefiles/2023/chp_pdb/LF_LIHTC_OBI_09242024.gpkg'), parent.frame())
 
 }
 

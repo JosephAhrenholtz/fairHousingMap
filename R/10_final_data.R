@@ -15,7 +15,7 @@
 #' @param geo allows for opportunity to be assessed at the tract level in urban areas and block group in rural areas
 #' @param write write the final output
 #' @param output `reduced` returns only variables necessary for the map.  If `full`, include all intermediate variables.
-#' @param cog logical to write COG referenced shapefile for HCD AFFH Data Viewer.  Is tract-only.  Counties within COG are COG-referenced.  Counties outside of COGS are county-referenced.
+#' @param cog logical to write COG referenced shapefile for HCD to be used in housing element update process.
 #'
 #'
 #' @return a data frame
@@ -118,7 +118,7 @@ final_opp <- function(year = current_year, write = FALSE, reduced = TRUE, cog  =
   final$oppscore[which(final$instit_flag == 1 | final$military_flag == 1 |
                          final$density_flag == 1)] <- NA
 
-  # load native land flag and apply hps invalidations
+  # load native land flag and apply hps invalidation
   final <- final %>%
     left_join(tribal_overlap(), by = 'fips')
   final$pov_seg_flag[which(final$instit_flag == 1 | final$military_flag == 1 |

@@ -6,8 +6,8 @@
 #' from the final 2023 TCAC file, creates a binary score for tracts in the bottom 5% of site-based hazards within regions, then
 #' crosswalks to 2020 tracts using an overlay method of >= 5% of intersecting land area.  The cross walking approach is a stop gap
 #' until OEHHA updates to 2020 boundaries.  The overlay approach was chosen over a weighted allocation (e.g. by area or population)
-#' because the site-based measures are already interpolated by OEHHA from points to tracts, and the research partners wanted to
-#' avoid re-interpolating already interpolated data.
+#' because the site-based measures are already interpolated by OEHHA from points to tracts, and the research partners decided to
+#' avoid re-interpolating the data.
 #'
 #'
 #' @param year designates the appropriate filepaths
@@ -63,7 +63,7 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write, testing
     mutate(env_site_mean = rowMeans(select(., cleanup_sites:solid_waste), na.rm = TRUE),
            env_site_pctl = percent_rank(env_site_mean))
 
-  
+
   if(testing_handle==TRUE){
     return(env)
   }
@@ -90,7 +90,7 @@ xwalk_ces <- function(year = current_year, write = FALSE, read = !write, testing
   xwalk <- readr::read_delim("https://www2.census.gov/geo/docs/maps-data/data/rel2020/tract/tab20_tract20_tract10_natl.txt", delim = "|") %>%
     transmute(GEOID10 = GEOID_TRACT_10, GEOID20 = GEOID_TRACT_20,
               AREALAND20 = AREALAND_TRACT_20, AREALAND_PART20 = AREALAND_PART) %>%
-    filter(substr(GEOID10, 1, 2) == "06") %>% #group_by(GEOID) %>% summarize(n = n())
+    filter(substr(GEOID10, 1, 2) == "06") %>%
     mutate(AREALAND_PART20 = AREALAND_PART20/AREALAND20)
 
   # apply 80% 2010-2020 xwalk land area overlap threshold for scoring

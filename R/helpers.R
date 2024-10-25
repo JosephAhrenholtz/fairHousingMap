@@ -1,4 +1,5 @@
-#' Reader functions for zipped files
+#' Includes miscellaneous helpers, including setting the default year, reader functions for zipped files,
+#' and data visualization themes.
 #'
 #'
 #' @param name file within zip directory
@@ -18,7 +19,6 @@
 
 # capture the current year for default function years
 current_year = 2025
-#current_year = as.numeric(strsplit(as.character(Sys.Date()),"-")[[1]][1])
 
 #' @export
 read_zip <- function(name, year, type = 'csv', ...) {
@@ -34,7 +34,7 @@ read_zip <- function(name, year, type = 'csv', ...) {
   if(type %in% c('excel', 'xls','xlsx')){
 
 
-    # Excel can't be read from zipped file, so unzip and then delete the file.
+    # excel can't be read from zipped file, so unzip and then delete the file.
     #extract file path, and rewrite the path back to the temp folder it will be extracted into.
     tempFolder = tempdir()
     output <- paste0(tempFolder, "\\", file_name)
@@ -45,8 +45,8 @@ read_zip <- function(name, year, type = 'csv', ...) {
     #delete the file after reading into R
     file.remove(output)
   }
-  else{ #readr functions
-    #get the connection inside the zip folder
+  else{ # readr functions
+    # get the connection inside the zip folder
     connection <- unz(description = paste0("data-raw/", data_year,".zip"), filename = file_name)
 
     if(type == 'csv') df <- readr::read_csv(connection, ...)
